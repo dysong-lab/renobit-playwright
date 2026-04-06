@@ -23,10 +23,10 @@ jobs:
     env:
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
     steps:
-    - uses: actions/checkout@v4
-    - uses: actions/setup-node@v4
+    - uses: actions/checkout@v5
+    - uses: actions/setup-node@v5
       with:
-        node-version: 20
+        node-version: 22
     - name: Install dependencies
       run: npm ci
     - name: Install Playwright Browsers
@@ -35,7 +35,7 @@ jobs:
       run: npx playwright test
       
     # 테스트가 실패하더라도 리포트는 보존하기 위해 !cancelled() 조건 사용
-    - uses: actions/upload-artifact@v4
+    - uses: actions/upload-artifact@v5
       if: ${{ !cancelled() }}
       with:
         name: playwright-report
@@ -45,11 +45,11 @@ jobs:
     # main 브랜치일 때만 Pages 배포용 아티팩트 생성 준비
     - name: Setup Pages
       if: github.ref == 'refs/heads/main' && !cancelled()
-      uses: actions/configure-pages@v4
+      uses: actions/configure-pages@v5
       
     - name: Upload artifact for GitHub Pages
       if: github.ref == 'refs/heads/main' && !cancelled()
-      uses: actions/upload-pages-artifact@v3
+      uses: actions/upload-pages-artifact@v4
       with:
         path: playwright-report/
 
@@ -65,4 +65,4 @@ jobs:
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
