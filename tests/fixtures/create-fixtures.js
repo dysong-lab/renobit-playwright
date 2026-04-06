@@ -8,11 +8,70 @@ const path = require('path');
 
 const dir = __dirname;
 
-// 1. page.json — 최소 유효 RENOBIT 페이지 내보내기 포맷 (실제 포맷과 다를 수 있음)
+// 1. page.json — ImportPagesCommand가 읽을 수 있는 최소 page export 포맷
 fs.writeFileSync(
   path.join(dir, 'page.json'),
   JSON.stringify(
-    { version: '3.5.0', page: { name: 'fixture-page', type: 'page', components: [] } },
+    {
+      data: {
+        page_info: {
+          id: 'fixture-page-id',
+          name: 'fixture-page',
+          type: 'page',
+          secret: 'N',
+          props: {
+            setter: {
+              width: 1920,
+              height: 1080,
+              mode: true,
+              type: 'page',
+              scene_info: '',
+              template_yn: 'N',
+              camera: {
+                x: -100,
+                y: 100,
+                z: 100,
+              },
+            },
+            background: {
+              using: false,
+              type: 'color',
+              data: {
+                color: '#ffffff',
+              },
+            },
+            events: {
+              loadstart: '',
+              loadcomplete: '',
+              ready: '',
+              unload: '',
+            },
+          },
+        },
+        master_info: {
+          background: {
+            color: '',
+            path: '',
+            image: '',
+            using: false,
+          },
+          master_layer: [],
+          scripts: {},
+        },
+        stage_info: {
+          background: {
+            color: '',
+            path: '',
+            image: '',
+            using: false,
+          },
+        },
+        content_info: {
+          two_layer: [],
+          three_layer: [],
+        },
+      },
+    },
     null,
     2
   )
@@ -22,7 +81,26 @@ fs.writeFileSync(
 fs.writeFileSync(
   path.join(dir, 'dataset.json'),
   JSON.stringify(
-    [{ id: 'fixture-ds-01', name: 'fixture_dataset', type: 'REST_API', url: 'https://jsonplaceholder.typicode.com/todos' }],
+    {
+      version: '3.5.0',
+      data: [
+        {
+          dataset_id: 'fixture-ds-01',
+          name: 'fixture_dataset',
+          description: 'fixture dataset',
+          data_type: 1,
+          delivery_type: 0,
+          interval: 10,
+          rest_api:
+            '{"url":"https://jsonplaceholder.typicode.com/todos","method":"GET","contentType":"application/json;charset=UTF-8","dataType":"json","data":{}}',
+          query: '',
+          query_type: 0,
+          param_info: [],
+          datasource: '',
+        },
+      ],
+      datasource: [],
+    },
     null,
     2
   )

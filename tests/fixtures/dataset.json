@@ -1,8 +1,19 @@
-[
-  {
-    "id": "fixture-ds-01",
-    "name": "fixture_dataset",
-    "type": "REST_API",
-    "url": "https://jsonplaceholder.typicode.com/todos"
-  }
-]
+{
+  "version": "3.5.0",
+  "data": [
+    {
+      "dataset_id": "fixture-ds-01",
+      "name": "fixture_dataset",
+      "description": "fixture dataset",
+      "data_type": 1,
+      "delivery_type": 0,
+      "interval": 10,
+      "rest_api": "{\"url\":\"https://jsonplaceholder.typicode.com/todos\",\"method\":\"GET\",\"contentType\":\"application/json;charset=UTF-8\",\"dataType\":\"json\",\"data\":{}}",
+      "query": "",
+      "query_type": 0,
+      "param_info": [],
+      "datasource": ""
+    }
+  ],
+  "datasource": []
+}

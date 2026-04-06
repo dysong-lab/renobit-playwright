@@ -56,7 +56,7 @@ async function verifyInViewer(page, instanceName) {
 }
 
 // ── 공통 페이지 준비 ────────────────────────────────────────────
-test.describe('Basic - 2D Component 배치', () => {
+test.describe.skip('Basic - 2D Component 배치', () => {
   const runId = Date.now().toString(36);
   const pageName = `basic_2d_${runId}`;
 

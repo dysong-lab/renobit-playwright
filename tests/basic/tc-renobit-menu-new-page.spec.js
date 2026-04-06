@@ -52,11 +52,10 @@ test.describe('Basic - RENOBIT 메뉴 > NEW PAGE', () => {
     const groupName = `basic_group_${runId}`;
 
     await page.evaluate(() => {
-      // TODO: showNewPage 인자가 'group'이 아닐 경우 수정 필요
       window.wemb.$createPageModal.showNewPage('group');
     });
     await page.waitForSelector('#createPageModal', { state: 'visible' });
-    await page.fill('#pageName', groupName);
+    await page.fill('#pageName2', groupName);
     await page.click('#createPageModal .el-button--primary');
 
     await page.waitForFunction(
@@ -76,7 +75,6 @@ test.describe('Basic - RENOBIT 메뉴 > NEW PAGE', () => {
     const masterName = `basic_master_${runId}`;
 
     await page.evaluate(() => {
-      // TODO: showNewPage 인자가 'master'가 아닐 경우 수정 필요
       window.wemb.$createPageModal.showNewPage('master');
     });
     await page.waitForSelector('#createPageModal', { state: 'visible' });

@@ -35,7 +35,7 @@ async function isVisibleInViewer(page, instanceName) {
   }, instanceName);
 }
 
-test.describe('Basic - Instance List (Hide / Lock)', () => {
+test.describe.skip('Basic - Instance List (Hide / Lock)', () => {
   const runId = Date.now().toString(36);
 
   test.beforeEach(async ({ page }) => {

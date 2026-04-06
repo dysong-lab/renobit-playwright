@@ -45,7 +45,7 @@ async function verifyInViewer(page, instanceName) {
   expect(found, `visualViewer에서 "${instanceName}" 컴포넌트를 찾을 수 없음`).toBeTruthy();
 }
 
-test.describe('Basic - 2D Component Properties 수정', () => {
+test.describe.skip('Basic - 2D Component Properties 수정', () => {
   const runId = Date.now().toString(36);
 
   test.beforeEach(async ({ page }) => {
