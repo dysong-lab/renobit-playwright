@@ -20,11 +20,10 @@ jobs:
   test:
     timeout-minutes: 60
     runs-on: ubuntu-latest
-    env:
-      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+      
     steps:
     - uses: actions/checkout@v5
-    - uses: actions/setup-node@v5
+    - uses: actions/setup-node@v6
       with:
         node-version: 22
     - name: Install dependencies
@@ -35,7 +34,7 @@ jobs:
       run: npx playwright test
       
     # 테스트가 실패하더라도 리포트는 보존하기 위해 !cancelled() 조건 사용
-    - uses: actions/upload-artifact@v5
+    - uses: actions/upload-artifact@v7
       if: ${{ !cancelled() }}
       with:
         name: playwright-report
@@ -45,11 +44,11 @@ jobs:
     # main 브랜치일 때만 Pages 배포용 아티팩트 생성 준비
     - name: Setup Pages
       if: github.ref == 'refs/heads/main' && !cancelled()
-      uses: actions/configure-pages@v5
+      uses: actions/configure-pages@v6
       
     - name: Upload artifact for GitHub Pages
       if: github.ref == 'refs/heads/main' && !cancelled()
-      uses: actions/upload-pages-artifact@v4
+      uses: actions/upload-pages-artifact@v5
       with:
         path: playwright-report/
 
@@ -65,4 +64,4 @@ jobs:
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v5
+        uses: actions/deploy-pages@v6
