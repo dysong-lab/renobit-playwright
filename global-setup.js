@@ -1,0 +1,28 @@
+const { chromium } = require('@playwright/test');
+
+const baseURL = process.env.PLAYWRIGHT_BASE_URL || 'http://127.0.0.1:6284';
+
+module.exports = async function globalSetup() {
+  const browser = await chromium.launch();
+  const page = await browser.newPage({ baseURL });
+
+  await page.goto('/renobit/login.do', { waitUntil: 'domcontentloaded' });
+  await page.locator('#idInput').fill('admin');
+  await page.locator('#pwInput').fill('didi0205');
+  await page.locator('#Editor').check();
+  await page.locator('button.new_btn').click();
+
+  await page.waitForURL(/\/renobit\/visual\.do#\//, { timeout: 20_000 });
+
+  // 에디터 완전 초기화까지 대기 (isLoaded = true: OpenPageCommand._completedLoadAllResource 완료)
+  await page.waitForFunction(
+    () =>
+      !!window.wemb?.mainPageComponent?.threeLayer &&
+      window.wemb?.mainPageComponent?.isLoaded === true,
+    { timeout: 60_000 }
+  );
+
+  // 인증 세션(쿠키 + localStorage) 저장
+  await page.context().storageState({ path: 'storageState.json' });
+  await browser.close();
+};

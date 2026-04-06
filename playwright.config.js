@@ -1,0 +1,23 @@
+const { defineConfig } = require('@playwright/test');
+
+const baseURL = process.env.PLAYWRIGHT_BASE_URL || 'http://127.0.0.1:6284';
+
+module.exports = defineConfig({
+  testDir: './tests',
+  timeout: 30_000,
+  expect: {
+    timeout: 5_000,
+  },
+  fullyParallel: false,
+  retries: 0,
+  globalSetup: './global-setup.js',
+  reporter: [['list'], ['html', { open: 'never' }]],
+  use: {
+    baseURL,
+    storageState: 'storageState.json',
+    headless: true,
+    trace: 'on-first-retry',
+    screenshot: 'only-on-failure',
+    video: 'retain-on-failure',
+  },
+});
