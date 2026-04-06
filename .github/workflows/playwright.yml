@@ -1,12 +1,12 @@
 name: Playwright Tests
 on:
-env:
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
-
   push:
     branches: [ main ]
   pull_request:
     branches: [ main ]
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 # GitHub Pages 배포를 위해 필요한 권한 설정
 permissions:
@@ -23,9 +23,6 @@ jobs:
   test:
     timeout-minutes: 60
     runs-on: ubuntu-latest
-
-
-      
     steps:
     - uses: actions/checkout@v5
     - uses: actions/setup-node@v6
@@ -63,8 +60,6 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
-
-
     needs: test
     # test가 성공하거나(실패하더라도 리포트는 보여줘야 하므로) main 브랜치일 때 실행
     if: github.ref == 'refs/heads/main' && (needs.test.result == 'success' || needs.test.result == 'failure')
