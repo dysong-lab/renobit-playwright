@@ -1,0 +1,8 @@
+{
+  "version": "3.5.0",
+  "page": {
+    "name": "fixture-page",
+    "type": "page",
+    "components": []
+  }
+}

@@ -170,6 +170,15 @@ async function cleanupComponents(page, prefix) {
   );
 }
 
+async function switchToTwoLayer(page) {
+  await page.evaluate(() => {
+    window.wemb.editorFacade.sendNotification('command/changeActvieLayer', 'twoLayer');
+  });
+  await page.waitForFunction(
+    () => window.wemb?.mainPageComponent?.activeLayer?.name === '_twoLayer'
+  );
+}
+
 async function switchToThreeLayer(page) {
   await page.evaluate(() => {
     window.wemb.editorFacade.sendNotification('command/changeActvieLayer', 'threeLayer');
@@ -471,6 +480,7 @@ module.exports = {
   selectThreeComponents,
   setThreeTransformMode,
   switchToThreeLayer,
+  switchToTwoLayer,
   waitForActiveEditorPage,
   waitForComponents,
   waitForEditorReady,

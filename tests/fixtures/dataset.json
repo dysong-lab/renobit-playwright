@@ -1,0 +1,8 @@
+[
+  {
+    "id": "fixture-ds-01",
+    "name": "fixture_dataset",
+    "type": "REST_API",
+    "url": "https://jsonplaceholder.typicode.com/todos"
+  }
+]
