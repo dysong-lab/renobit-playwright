@@ -48,7 +48,7 @@ jobs:
       
     - name: Upload artifact for GitHub Pages
       if: github.ref == 'refs/heads/main' && !cancelled()
-      uses: actions/upload-pages-artifact@v5
+      uses: actions/upload-pages-artifact@v3
       with:
         path: playwright-report/
 
@@ -64,4 +64,4 @@ jobs:
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v6
+        uses: actions/deploy-pages@v5
