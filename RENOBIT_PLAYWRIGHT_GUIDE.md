@@ -8,8 +8,8 @@
 
 - E2E 프로젝트 위치: `/Users/dayoung/dev/e2e`
 - 테스트 대상: `RENOBIT 3.5.0`
-- 접속 주소: `http://127.0.0.1:6284`
-- 로그인 계정: `admin / didi0205`
+- 접속 주소: `http://10.23.128.203:9000`
+- 로그인 계정: `admin / wemb@#@#`
 - 에디터 진입 경로: `/renobit/login.do`
 
 ---
@@ -327,7 +327,7 @@ Confluence 문서는 일반적인 Playwright 프로젝트 설명에 가깝고, R
 ## Quick Start
 
 1. Start Tomcat with the desired RENOBIT version (e.g., `docker compose up -d db tomcat-3.5.0`).
-2. Verify `http://127.0.0.1:6284/renobit/login.do` is reachable.
+2. Verify `http://10.23.128.203:9000/renobit/login.do` is reachable.
 3. Run `npm install` and `npx playwright install` inside `/Users/dayoung/dev/e2e` if not already done.
 4. Execute `npm test` or `npm run test:headed` depending on whether you need UI playback.
 5. Open the HTML report with `npm run report` after failure for screenshots/traces.
@@ -357,7 +357,7 @@ Confluence 문서는 일반적인 Playwright 프로젝트 설명에 가깝고, R
 
 1. **Tomcat/RENOBIT 배포**
    - 원하는 버전의 WAR를 `renobit/versions/<version>`에 둔 뒤 `docker compose up -d db tomcat-<version>`으로 Tomcat을 띄웁니다.
-   - `http://127.0.0.1:6284/renobit/login.do`가 접근 가능한지 확인하고, `admin / didi0205` 계정이 Editor 접근 가능해야 합니다.
+   - `http://10.23.128.203:9000/renobit/login.do`가 접근 가능한지 확인하고, `admin / wemb@#@#` 계정이 Editor 접근 가능해야 합니다.
 2. **로컬 데이터 준비**
    - 테스트 전 `Tc` 전용 데이터를 초기화하는 스크립트를 실행하거나, `pageTreeDataManager.addPage`로 기본 페이지를 미리 만들어 둡니다.
    - `license_yn = Y` 등 필수 설정은 DB 또는 초기화 스크립트에서 맞춥니다.

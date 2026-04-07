@@ -1,8 +1,48 @@
+async function setLoginCredentials(page, { username, password }) {
+  await page.waitForSelector('#idInput', { state: 'visible' });
+  await page.waitForSelector('#pwInput', { state: 'visible' });
+
+  await page.evaluate(
+    ({ id, pw }) => {
+      const idInput = document.getElementById('idInput');
+      const pwInput = document.getElementById('pwInput');
+
+      if (!idInput || !pwInput) {
+        throw new Error('Login inputs are not available');
+      }
+
+      idInput.focus();
+      idInput.value = '';
+      idInput.dispatchEvent(new Event('input', { bubbles: true }));
+      idInput.value = id;
+      idInput.dispatchEvent(new Event('input', { bubbles: true }));
+      idInput.dispatchEvent(new Event('change', { bubbles: true }));
+
+      pwInput.focus();
+      pwInput.value = '';
+      pwInput.dispatchEvent(new Event('input', { bubbles: true }));
+      pwInput.value = pw;
+      pwInput.dispatchEvent(new Event('input', { bubbles: true }));
+      pwInput.dispatchEvent(new Event('change', { bubbles: true }));
+    },
+    { id: username, pw: password }
+  );
+
+  await page.waitForFunction(
+    ({ id, pw }) =>
+      document.getElementById('idInput')?.value === id &&
+      document.getElementById('pwInput')?.value === pw,
+    { id: username, pw: password }
+  );
+}
+
 async function loginAsEditor(page) {
   await page.goto('/renobit/login.do', { waitUntil: 'domcontentloaded' });
 
-  await page.locator('#idInput').fill('admin');
-  await page.locator('#pwInput').fill('didi0205');
+  await setLoginCredentials(page, {
+    username: 'admin',
+    password: 'didi0205',
+  });
   await page.locator('#Editor').check();
   await page.locator('button.new_btn').click();
 
@@ -17,13 +57,81 @@ async function loginAsEditor(page) {
   );
 }
 
-async function waitForEditorReady(page) {
+async function submitEditorLogin(page) {
+  await setLoginCredentials(page, {
+    username: 'admin',
+    password: 'didi0205',
+  });
+  await page.locator('#Editor').check();
+  await page.locator('button.new_btn').click();
+  await page.waitForURL(/\/renobit\/visual\.do#\//, { timeout: 20_000 });
+  // new_btn은 새 페이지를 생성하므로 threeLayer + isLoaded까지 대기한다.
   await page.waitForFunction(
     () =>
       !!window.wemb?.mainPageComponent?.threeLayer &&
-      !!window.wemb?.$createPageModal &&
-      window.wemb?.mainPageComponent?.isLoaded === true
+      window.wemb?.mainPageComponent?.isLoaded === true,
+    { timeout: 60_000 }
   );
+}
+
+async function waitForEditorReady(page) {
+  // source 기준 READY_COMPLETED + page tree 초기화까지 확인해야
+  // createPageModal / pageTreeDataManager 사용 시점이 안전하다.
+  await page.waitForFunction(
+    () => {
+      const editorProxy = window.wemb?.editorProxy;
+      const pageTreeDataManager = window.wemb?.pageTreeDataManager;
+
+      return !!(
+        window.wemb?.editorFacade &&
+        window.wemb?.mainPageComponent &&
+        window.wemb?.$createPageModal &&
+        editorProxy &&
+        (editorProxy._readyCompleted === true ||
+          editorProxy.getReadyCompleted?.() === true ||
+          editorProxy._appState === 'readyCompleted') &&
+        pageTreeDataManager?._rootId &&
+        pageTreeDataManager?.focusTargetId &&
+        Array.isArray(pageTreeDataManager?.treeData)
+      );
+    },
+    { timeout: 60_000 }
+  );
+}
+
+async function ensureEditorSession(page) {
+  await page.goto('/renobit/visual.do', { waitUntil: 'domcontentloaded' });
+
+  const loginInput = page.locator('#idInput');
+  if (
+    page.url().includes('/renobit/login.do') ||
+    (await loginInput.isVisible().catch(() => false))
+  ) {
+    await submitEditorLogin(page);
+    return;
+  }
+
+  await page.waitForURL(/\/renobit\/visual\.do#\//, { timeout: 20_000 });
+  await waitForEditorReady(page);
+
+  // 빈 상태(no active page)이면 treeData의 첫 번째 page를 열어 _masterLayer를 초기화한다.
+  // _masterLayer는 페이지 열릴 때 생성되며, createPageByType이 이를 필요로 하기 때문이다.
+  const hasActivePage = await page.evaluate(
+    () => !!window.wemb?.pageManager?.currentPageInfo?.id
+  );
+  if (!hasActivePage) {
+    const firstPageId = await page.evaluate(() => {
+      const treeData = window.wemb?.pageTreeDataManager?.treeData || [];
+      const firstPage = treeData.find((item) => item.type === 'page');
+      return firstPage?.id || null;
+    });
+    if (firstPageId) {
+      await page.evaluate((id) => {
+        window.wemb.editorFacade.sendNotification('command/openPage', id);
+      }, firstPageId);
+      await waitForActiveEditorPage(page, firstPageId);
+    }
+  }
 }
 
 /**
@@ -31,20 +139,17 @@ async function waitForEditorReady(page) {
  * loginAsEditor 대신 사용 (로그인 폼 제출 없이 세션 재사용).
  */
 async function goToEditor(page) {
-  await page.goto('/renobit/visual.do', { waitUntil: 'domcontentloaded' });
-  await page.waitForURL(/\/renobit\/visual\.do#\//, { timeout: 20_000 });
-  await waitForEditorReady(page);
+  await ensureEditorSession(page);
 }
 
 async function waitForActiveEditorPage(page, pageId) {
+  // _isOpenPage는 소스에서 주석처리되어 사용 불가. isLoaded === true가 실제 완료 신호.
   await page.waitForFunction(
     (id) => {
       return (
         window.wemb?.pageManager?.currentPageInfo?.id === id &&
-        window.wemb?.editorProxy?._isOpenPage === true &&
         !!window.wemb?.mainPageComponent?.threeLayer &&
-        window.wemb?.mainPageComponent?.isLoaded === true &&
-        window.wemb?.mainPageComponent?.isLoading === false
+        window.wemb?.mainPageComponent?.isLoaded === true
       );
     },
     pageId,
@@ -89,6 +194,49 @@ async function findPageIdByName(page, pageName) {
   }, pageName);
 }
 
+async function closeCreatePageModalIfVisible(page) {
+  const modal = page.locator('#createPageModal');
+  if (!(await modal.isVisible().catch(() => false))) {
+    return;
+  }
+
+  const closeButton = modal.locator('.close-modal-btn').first();
+  if (await closeButton.isVisible().catch(() => false)) {
+    await closeButton.click();
+    await modal.waitFor({ state: 'hidden', timeout: 10_000 }).catch(() => {});
+  }
+}
+
+async function createPageByType(page, { type = 'page', name, mobile = false }) {
+  await page.waitForFunction(() => !!window.wemb?.$createPageModal, { timeout: 15_000 });
+
+  // showNewPage 후 Vue nextTick 대기 후 name 설정 → reactive state 확실히 반영
+  await page.evaluate(
+    async ({ createType, pageName, isMobile }) => {
+      const modal = window.wemb?.$createPageModal;
+      if (!modal) {
+        throw new Error('CreatePageModal is not ready');
+      }
+
+      modal.showNewPage(createType);
+      await new Promise((resolve) => modal.$nextTick(resolve));
+
+      if (createType === 'group') {
+        modal.pageGroupName = pageName;
+        await modal._createPageGroup();
+        return;
+      }
+
+      modal.pageInfoProperties.name = pageName;
+      if (createType === 'master') {
+        modal.isMobile = isMobile;
+      }
+      await modal._createPage();
+    },
+    { createType: type, pageName: name, isMobile: mobile }
+  );
+}
+
 /**
  * tc-page-3d 페이지를 열거나 생성하고, 완전히 로드될 때까지 대기한다.
  * isLoaded === true가 OpenPageCommand._completedLoadAllResource 완료 신호.
@@ -96,34 +244,26 @@ async function findPageIdByName(page, pageName) {
 async function ensureTestPage(page, pageName = 'tc-page-3d') {
   let pageId = await findPageIdByName(page, pageName);
   if (!pageId) {
-    await page.evaluate(() => {
-      window.wemb.$createPageModal.showNewPage('page');
-    });
-    await page.waitForSelector('#createPageModal', { state: 'visible' });
-    await page.fill('#pageName', pageName);
-    await page.click('#createPageModal .el-button--primary');
-// 모달에서 생성 버튼 클릭 후
-  await page.waitForFunction(
-    (name) => window.wemb?.pageManager?.currentPageInfo?.name === name,
-    pageName
-  );
-  pageId = await page.evaluate(() => window.wemb?.pageManager?.currentPageInfo?.id);
+    await createPageByType(page, { type: 'page', name: pageName });
+    await page.waitForFunction(
+      (name) =>
+        (window.wemb?.pageTreeDataManager?.treeData || []).some(
+          (item) => item.text === name && item.type === 'page'
+        ),
+      pageName,
+      { timeout: 30_000 }
+    );
+    pageId = await findPageIdByName(page, pageName);
 
-    // await page.waitForFunction(
-    //   () =>
-    //     Array.isArray(window.wemb?.pageTreeDataManager?.treeData) &&
-    //     window.wemb.pageTreeDataManager.treeData.length > 0
-    // );
+    await page
+      .waitForFunction(
+        (name) => window.wemb?.pageManager?.currentPageInfo?.name === name,
+        pageName,
+        { timeout: 30_000 }
+      )
+      .catch(() => {});
 
-    // await page.waitForFunction(
-    //   (name) =>
-    //     (window.wemb?.pageTreeDataManager?.treeData || []).some(
-    //       (item) => item.name === name && item.type === 'page'
-    //     ),
-    //   pageName
-    // );
-
-    // pageId = await findPageIdByName(page, pageName);
+    await closeCreatePageModalIfVisible(page);
   }
 
   const alreadyOpen =
@@ -175,7 +315,8 @@ async function switchToTwoLayer(page) {
     window.wemb.editorFacade.sendNotification('command/changeActvieLayer', 'twoLayer');
   });
   await page.waitForFunction(
-    () => window.wemb?.mainPageComponent?.activeLayer?.name === '_twoLayer'
+    () => window.wemb?.mainPageComponent?.activeLayer?.name === '_twoLayer',
+    { timeout: 15_000 }
   );
 }
 
@@ -185,7 +326,8 @@ async function switchToThreeLayer(page) {
   });
 
   await page.waitForFunction(
-    () => window.wemb?.mainPageComponent?.activeLayer?.name === '_threeLayer'
+    () => window.wemb?.mainPageComponent?.activeLayer?.name === '_threeLayer',
+    { timeout: 15_000 }
   );
 }
 
@@ -468,6 +610,9 @@ module.exports = {
   addThreeBox,
   applyTempGroupTransform,
   cleanupComponents,
+  closeCreatePageModalIfVisible,
+  createPageByType,
+  ensureEditorSession,
   ensureActivePage,
   ensureTestPage,
   getComponentState,
@@ -478,6 +623,7 @@ module.exports = {
   moveSelectedByKeyboard,
   savePage,
   selectThreeComponents,
+  setLoginCredentials,
   setThreeTransformMode,
   switchToThreeLayer,
   switchToTwoLayer,

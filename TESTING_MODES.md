@@ -7,7 +7,7 @@
 - **목표**: 개발 중인 프론트 소스를 직접 열어 helper 수준의 동작(페이지 생성, 3D 객체 생성/선택, transform validation)을 빠르게 검증한다.
 - **환경**
   - `node 16` 기반 로컬 모노레포(`source/front`)를 빌드하거나 dev server로 띄운 상태
-  - Playwright는 `dev/e2e`에서 `baseURL=http://127.0.0.1:6284`
+  - Playwright는 `dev/e2e`에서 `baseURL=http://10.23.128.203:9000`
   - `Editor` 로그인 → helper로 page/box 생성 → 3D 검증 시나리오
 - **용도**
   - helper 개발/디버깅
@@ -21,7 +21,7 @@
 
 - **목표**: 실제 배포할 WAR/버전 폴더를 Tomcat에 배포한 상태에서 “배포산출물이 운영과 동일하게 동작하는지”를 검증한다.
 - **환경**
-  - `renobit/versions/3.5.0` 같은 정적 배포 폴더를 Tomcat에 올린 뒤 `http://127.0.0.1:6284/renobit`
+  - `renobit/versions/3.5.0` 같은 정적 배포 폴더를 Tomcat에 올린 뒤 `http://10.23.128.203:9000/renobit`
   - Playwright `baseURL`은 배포 서버 (환경변수 `PLAYWRIGHT_BASE_URL`로 조절 가능)
   - 테스트는 주로 UI 흐름(로그인, Editor 진입, page dropdown, viewer rendering)과 스크린샷 비교, trace 캡처에 집중
 - **용도**

@@ -3,7 +3,7 @@
 > 작성일: 2026-04-03
 > 
 > 
-> 기준 환경: `dev/e2e` / RENOBIT 3.5.0 / `http://127.0.0.1:6284`
+> 기준 환경: `dev/e2e` / RENOBIT 3.5.0 / `http://10.23.128.203:9000`
 > 
 
 ---
@@ -218,7 +218,7 @@ if (!hasPage) {
 docker compose up -d db tomcat-3.5.0
 
 # 2. 접속 확인
-open <http://127.0.0.1:6284/renobit/login.do>
+open <http://10.23.128.203:9000/renobit/login.do>
 
 # 3. Playwright 의존성 설치 (최초 1회)
 cd /Users/dayoung/dev/e2e
