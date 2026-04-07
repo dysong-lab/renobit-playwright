@@ -1,6 +1,6 @@
 const { defineConfig } = require('@playwright/test');
 
-const baseURL = process.env.PLAYWRIGHT_BASE_URL || 'http://127.0.0.1:6284';
+const baseURL = process.env.PLAYWRIGHT_BASE_URL || 'http://10.23.128.203:9000';
 
 module.exports = defineConfig({
   testDir: './tests',

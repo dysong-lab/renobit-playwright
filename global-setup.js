@@ -1,6 +1,6 @@
 const { chromium } = require('@playwright/test');
 
-const baseURL = process.env.PLAYWRIGHT_BASE_URL || 'http://127.0.0.1:6284';
+const baseURL = process.env.PLAYWRIGHT_BASE_URL || 'http://10.23.128.203:9000';
 
 module.exports = async function globalSetup() {
   const browser = await chromium.launch();
@@ -8,7 +8,7 @@ module.exports = async function globalSetup() {
 
   await page.goto('/renobit/login.do', { waitUntil: 'domcontentloaded' });
   await page.locator('#idInput').fill('admin');
-  await page.locator('#pwInput').fill('didi0205');
+  await page.locator('#pwInput').fill('wemb@#@#');
   await page.locator('#Editor').check();
   await page.locator('button.new_btn').click();
 

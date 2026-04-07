@@ -1,9 +1,13 @@
 const { test, expect } = require('@playwright/test');
-const { goToEditor, ensureTestPage, savePage, switchToTwoLayer } = require('../helpers/renobit');
+const {
+  goToEditor,
+  ensureTestPage,
+  switchToTwoLayer,
+  waitForActiveEditorPage,
+} = require('../helpers/renobit');
 
 test.setTimeout(90_000);
 
-/** 컴포넌트 배치 헬퍼 */
 async function addComponent(page, componentName, instanceName) {
   await page.evaluate(
     ({ compName, instName }) => {
@@ -14,6 +18,7 @@ async function addComponent(page, componentName, instanceName) {
     },
     { compName: componentName, instName: instanceName }
   );
+
   await page.waitForFunction(
     (name) => !!window.wemb?.mainPageComponent?.getComInstanceByName?.(name),
     instanceName,
@@ -21,87 +26,84 @@ async function addComponent(page, componentName, instanceName) {
   );
 }
 
-/** visualViewer에서 요소 존재 여부 반환 */
-async function isVisibleInViewer(page, instanceName) {
-  await page.goto('/renobit/visualViewer.do', { waitUntil: 'domcontentloaded' });
-  await page.waitForTimeout(3_000);
-  // TODO: visualViewer DOM 구조에 맞는 selector 확인 필요
-  return page.evaluate((name) => {
-    const el =
-      document.querySelector(`[data-instance-name="${name}"]`) ||
-      document.querySelector(`[id="${name}"]`) ||
-      document.querySelector(`[data-name="${name}"]`);
-    return el ? window.getComputedStyle(el).display !== 'none' : false;
-  }, instanceName);
+async function openInstanceList(page) {
+  await page.evaluate(() => {
+    const sideNavbar = window.wemb?.viewComponentMap?.get?.('SideNavbarMediator');
+    if (!sideNavbar) {
+      throw new Error('SideNavbarMediator view is not ready');
+    }
+    sideNavbar.activeIndex = 'listbar-3';
+  });
+
+  await page.locator('#outline-panel-content').waitFor({ state: 'visible', timeout: 15_000 });
 }
 
-test.describe.skip('Basic - Instance List (Hide / Lock)', () => {
+async function ensureEditablePage(page, pageId) {
+  await waitForActiveEditorPage(page, pageId);
+
+  const emptyEditorMessage = page.getByText('활성화된 페이지가 존재하지 않습니다. 먼저 페이지를 만들어주세요.');
+  if (await emptyEditorMessage.isVisible().catch(() => false)) {
+    await page.evaluate((id) => {
+      window.wemb.editorFacade.sendNotification('command/openPage', id);
+    }, pageId);
+
+    await waitForActiveEditorPage(page, pageId);
+    await expect(emptyEditorMessage).toBeHidden({ timeout: 15_000 });
+  }
+}
+
+test.describe('Basic - Instance List (Hide / Lock)', () => {
   const runId = Date.now().toString(36);
 
   test.beforeEach(async ({ page }) => {
     await goToEditor(page);
-    await ensureTestPage(page, `basic_instlist_${runId}`);
+    const pageId = await ensureTestPage(page, `basic_instlist_${runId}`);
+    await ensureEditablePage(page, pageId);
     await switchToTwoLayer(page);
+    await openInstanceList(page);
   });
 
-  test('icon-view(숨기기) — viewer에서 컴포넌트 미노출 확인', async ({ page }) => {
+  test('icon-view(숨기기) — Instance List에서 visible 토글', async ({ page }) => {
     const instName = `hide_test_${runId}`;
-    await addComponent(page, 'ActiveGroupBtnComponent', instName);
+    await addComponent(page, 'BsFiguresComponent', instName);
 
-    // instance list에서 해당 인스턴스 행의 눈 아이콘 클릭 (visible=false)
-    // TODO: instance list 패널의 눈 아이콘 selector 확인 필요
-    await page.evaluate((name) => {
-      const comp = window.wemb?.mainPageComponent?.getComInstanceByName?.(name);
-      if (!comp) throw new Error(`Component not found: ${name}`);
-      // visible 속성을 false로 설정
-      // TODO: 실제 visible 속성 setter/커맨드 확인 필요
-      window.wemb.editorFacade.sendNotification('command/setComponentVisible', {
-        instance: comp,
-        visible: false,
-      });
-    }, instName);
+    const row = page.locator('#outline-panel-content tr').filter({ hasText: instName }).first();
+    await expect(row).toBeVisible();
 
-    // instance list UI에서 아이콘 상태 확인
-    // TODO: selector 확인 필요
-    const iconView = page.locator(`.instance-list [data-name="${instName}"] .icon-view, .instance-list [data-name="${instName}"] .icon-hide`);
-    // await expect(iconView).toHaveClass(/hidden/);
+    const viewButton = row.locator('.icon-view').first();
+    await expect(viewButton).toBeVisible();
+    await viewButton.click();
 
-    await savePage(page);
-
-    // viewer에서 미노출 확인
-    const visible = await isVisibleInViewer(page, instName);
-    expect(visible, `viewer에서 ${instName}이 보이면 안 됨`).toBeFalsy();
-    console.log('[PASS] icon-view(숨기기) → viewer에서 컴포넌트 미노출 확인');
+    await expect(viewButton).toHaveClass(/off/);
+    await page.waitForFunction(
+      (name) => {
+        const comp = window.wemb?.mainPageComponent?.getComInstanceByName?.(name);
+        return comp?.editorModeVisible === false;
+      },
+      instName,
+      { timeout: 10_000 }
+    );
   });
 
-  test('icon-lock(잠금) — viewer에서 컴포넌트 정상 노출 확인', async ({ page }) => {
+  test('icon-lock(잠금) — Instance List에서 lock 토글', async ({ page }) => {
     const instName = `lock_test_${runId}`;
-    await addComponent(page, 'ActiveGroupBtnComponent', instName);
+    await addComponent(page, 'BsFiguresComponent', instName);
 
-    // instance list에서 잠금 아이콘 클릭 (locked=true)
-    // TODO: 잠금 커맨드 확인 필요
-    await page.evaluate((name) => {
-      const comp = window.wemb?.mainPageComponent?.getComInstanceByName?.(name);
-      if (!comp) throw new Error(`Component not found: ${name}`);
-      window.wemb.editorFacade.sendNotification('command/setComponentLocked', {
-        instance: comp,
-        locked: true,
-      });
-    }, instName);
+    const row = page.locator('#outline-panel-content tr').filter({ hasText: instName }).first();
+    await expect(row).toBeVisible();
 
-    // 잠금 상태에서도 컴포넌트는 visible=true 유지
-    const isVisible = await page.evaluate((name) => {
-      const comp = window.wemb?.mainPageComponent?.getComInstanceByName?.(name);
-      // TODO: visible 속성명 확인 필요
-      return comp?.visible !== false;
-    }, instName);
-    expect(isVisible, `${instName}의 visible이 false면 안 됨`).toBeTruthy();
+    const lockButton = row.locator('.icon-lock').first();
+    await expect(lockButton).toBeVisible();
+    await lockButton.click();
 
-    await savePage(page);
-
-    // viewer에서 정상 노출 확인
-    const visible = await isVisibleInViewer(page, instName);
-    expect(visible, `viewer에서 ${instName}이 보여야 함`).toBeTruthy();
-    console.log('[PASS] icon-lock(잠금) → viewer에서 컴포넌트 정상 노출 확인');
+    await expect(lockButton).toHaveClass(/on/);
+    await page.waitForFunction(
+      (name) => {
+        const comp = window.wemb?.mainPageComponent?.getComInstanceByName?.(name);
+        return comp?.lock === true && comp?.editorModeVisible !== false;
+      },
+      instName,
+      { timeout: 10_000 }
+    );
   });
 });
