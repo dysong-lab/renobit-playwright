@@ -1,8 +1,8 @@
 # RENOBIT 3.5.0 Common Regression Test Cases
 
 기준 환경
-- Base URL: `http://localhost:6284`
-- 로그인 계정: `admin / didi0205`
+- Base URL: `http://10.23.128.203:9000`
+- 로그인 계정: `admin / wemb@#@#`
 - 대상: `RENOBIT 3.5.0`
 - 목적: 라이브러리 업데이트 또는 공통 기능 회귀 점검 시 재사용할 기본 기능 기준 TC
 
@@ -24,6 +24,92 @@ Expected Results
 - 로그인 요청 후 `/renobit/visual.do#/` URL로 이동해야 한다.
 - `mainPageComponent.isLoaded` 값이 `true` 가 되어 에디터 초기화가 완료되어야 한다.
 - `threeLayer` 및 페이지 생성 모달이 준비되어 이후 회귀 TC의 시작점으로 사용할 수 있어야 한다.
+
+### TC-R35-COM-002 Common Header - Viewer 링크 이동
+Preconditions
+- 에디터 로그인 완료 상태여야 한다.
+- Viewer 링크가 header 영역에 노출되어 있어야 한다.
+
+Expected Results
+- Viewer 링크 클릭 시 새 창 또는 새 페이지가 열려야 한다.
+- 이동된 URL 이 viewer 경로를 포함해야 한다.
+- 기존 에디터 세션은 유지되어야 한다.
+
+### TC-R35-COM-003 Common Header - Admin 링크 이동
+Preconditions
+- 에디터 로그인 완료 상태여야 한다.
+- Admin 링크가 header 영역에 노출되어 있어야 한다.
+
+Expected Results
+- Admin 링크 클릭 시 새 창 또는 새 페이지가 열려야 한다.
+- 이동된 URL 이 admin 경로를 포함해야 한다.
+- 기존 에디터 세션은 유지되어야 한다.
+
+### TC-R35-COM-004 Common Header - Logout 동작
+Preconditions
+- 에디터 로그인 완료 상태여야 한다.
+- Logout 링크가 header 영역에 노출되어 있어야 한다.
+
+Expected Results
+- Logout 실행 후 로그인 페이지 또는 재인증이 필요한 상태로 이동해야 한다.
+- 기존 editor session 은 더 이상 유효하지 않아야 한다.
+
+### TC-R35-COM-005 Common Toolbar - Copy/Cut/Paste/Delete 기본 상태
+Preconditions
+- 에디터 로그인 완료 상태여야 한다.
+- 공통 toolbar 영역이 노출되어 있어야 한다.
+
+Expected Results
+- Copy, Cut, Paste, Delete 버튼이 표시되어야 한다.
+- 초기 상태에서 선택 대상이 없으면 비활성 또는 실행 불가 상태가 유지되어야 한다.
+
+### TC-R35-COM-006 Common Toolbar - Layer 영역 기본 버튼 표시
+Preconditions
+- 에디터 로그인 완료 상태여야 한다.
+
+Expected Results
+- Layer 영역의 기본 버튼이 표시되어야 한다.
+- 2D, 3D, Master, Layer 관련 전환 UI 가 노출되어야 한다.
+
+### TC-R35-COM-007 Common Toolbar - View 영역 기본 버튼 표시
+Preconditions
+- 에디터 로그인 완료 상태여야 한다.
+
+Expected Results
+- View 영역의 기본 버튼이 표시되어야 한다.
+- 보기 관련 버튼이 공통 header 또는 toolbar 에서 식별 가능해야 한다.
+
+### TC-R35-COM-008 Common Toolbar - Mobile Master 영역 기본 버튼 표시
+Preconditions
+- 에디터 로그인 완료 상태여야 한다.
+
+Expected Results
+- Mobile Master 관련 버튼 또는 토글 영역이 표시되어야 한다.
+
+### TC-R35-COM-009 Common Header - Zoom 토글 표시
+Preconditions
+- 에디터 로그인 완료 상태여야 한다.
+
+Expected Results
+- Zoom 표시 또는 zoom control UI 가 보여야 한다.
+- 사용자가 현재 편집 배율을 확인할 수 있어야 한다.
+
+### TC-R35-COM-010 Common Header - Device/View 선택 combobox 표시
+Preconditions
+- 에디터 로그인 완료 상태여야 한다.
+
+Expected Results
+- Device 또는 View 선택용 combobox 가 표시되어야 한다.
+- 선택 UI 는 비정상 스크립트 에러 없이 열릴 수 있어야 한다.
+
+### TC-R35-COM-011 Empty State - 활성 페이지 미존재 메시지 표시
+Preconditions
+- 에디터 로그인 완료 상태여야 한다.
+- 활성 페이지가 없는 상태여야 한다.
+
+Expected Results
+- 활성 페이지가 존재하지 않는다는 empty state 메시지가 표시되어야 한다.
+- 사용자가 신규 페이지 생성 흐름으로 이동할 수 있어야 한다.
 
 ## Page
 
@@ -177,7 +263,35 @@ Expected Results
 - `fixture_dataset` 이 목록에 표시되어야 한다.
 - 추가하기 또는 primary action 버튼이 보여야 한다.
 
-### TC-R35-DS-004 REST API 타입 데이터셋 생성/수정 TC
+### TC-R35-DS-004 Dataset 파일 가져오기 TC
+Preconditions
+- 에디터 로그인 완료 상태여야 한다.
+- Dataset Manager 진입이 완료되어야 한다.
+- `.json` 형식의 dataset fixture 파일이 준비되어 있어야 한다.
+
+Expected Results
+- 파일 가져오기 다이얼로그가 열려야 한다.
+- fixture dataset 목록이 표시되어야 한다.
+- 추가하기 실행 후 가져오기 완료 메시지가 표시되어야 한다.
+
+상태
+- 현재 자동화는 `pending`
+
+### TC-R35-DS-005 Dataset 파일 내보내기 TC
+Preconditions
+- 에디터 로그인 완료 상태여야 한다.
+- Dataset Manager 진입이 완료되어야 한다.
+- 내보낼 수 있는 dataset 이 존재해야 한다.
+
+Expected Results
+- 파일 내보내기 다이얼로그가 열려야 한다.
+- 대상 dataset 선택 후 내보내기 실행이 가능해야 한다.
+- 완료 메시지 또는 다운로드 시작이 확인되어야 한다.
+
+상태
+- 현재 자동화는 `pending`
+
+### TC-R35-DS-006 REST API 타입 데이터셋 생성/수정 TC
 Preconditions
 - 에디터 로그인 완료 상태여야 한다.
 - Dataset Manager 진입이 완료되어야 한다.
@@ -191,7 +305,7 @@ Expected Results
 상태
 - 현재 자동화는 `pending`
 
-### TC-R35-DS-005 DB Query 타입 데이터셋 생성/수정 TC
+### TC-R35-DS-007 DB Query 타입 데이터셋 생성/수정 TC
 Preconditions
 - 에디터 로그인 완료 상태여야 한다.
 - Dataset Manager 진입이 완료되어야 한다.
@@ -205,7 +319,7 @@ Expected Results
 상태
 - 현재 자동화는 `pending`
 
-### TC-R35-DS-006 TIM 타입 데이터셋 설정 TC
+### TC-R35-DS-008 TIM 타입 데이터셋 설정 TC
 Preconditions
 - 에디터 로그인 완료 상태여야 한다.
 - Dataset Manager 진입이 완료되어야 한다.
@@ -290,22 +404,19 @@ Preconditions
 - 2D 레이어가 활성화되어 있어야 한다.
 
 Expected Results
-- `CodeBoxComponent` 가 페이지에 배치되어야 한다.
+- `FreeCode` 컴포넌트가 페이지에 배치되어야 한다.
 - 배치 직후 `mainPageComponent` 에서 해당 인스턴스를 조회할 수 있어야 한다.
 
-### TC-R35-CB-002 CodeBox HTML/JS 입력 TC
+### TC-R35-CB-002 CodeBox 편집기 열기
 Preconditions
 - 에디터 로그인 완료 상태여야 한다.
 - CodeBox 컴포넌트가 배치되어 있어야 한다.
-- CodeBox 내부 편집기 selector 와 저장 동작 기준이 확정되어야 한다.
+- 선택한 인스턴스를 대상으로 script editor 를 열 수 있어야 한다.
 
 Expected Results
-- HTML 과 JS 입력이 가능해야 한다.
-- 입력 후 저장 시 편집 내용이 유지되어야 한다.
-- viewer 또는 런타임에서 입력 결과를 확인할 수 있어야 한다.
-
-상태
-- 현재 자동화는 `pending`
+- `/#/codeBox` 팝업이 열려야 한다.
+- 팝업 내부 편집 대상이 방금 선택한 `FreeCode` 인스턴스로 표시되어야 한다.
+- 이후 HTML/CSS/JS 입력 테스트의 시작점으로 사용할 수 있어야 한다.
 
 ## 3D
 
@@ -328,4 +439,3 @@ Preconditions
 Expected Results
 - 다중 선택 후 이동, 회전, 스케일이 두 컴포넌트에 함께 반영되어야 한다.
 - 저장 후 새로고침해도 `position`, `rotation`, `size` 값이 유지되어야 한다.
-
