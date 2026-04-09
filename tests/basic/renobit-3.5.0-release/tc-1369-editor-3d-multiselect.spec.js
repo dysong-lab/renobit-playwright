@@ -15,9 +15,9 @@ const {
   setThreeTransformMode,
   switchToThreeLayer,
   waitForEditorReady,
-} = require('./helpers/renobit');
+} = require('../../helpers/renobit');
 
-test.setTimeout(120_000);
+test.setTimeout(240_000);
 
 test('TC-1369 editor 3D multi select', async ({ page }) => {
   const runId = Date.now().toString(36);

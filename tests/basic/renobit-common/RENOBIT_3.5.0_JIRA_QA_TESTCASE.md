@@ -1,0 +1,872 @@
+# RENOBIT 3.5.0 Jira QA Test Case
+
+- Source: Jira `QATC` project (`https://wembcorp.atlassian.net`)
+- Label/Scope: `RENOBIT`
+- Target epics:
+  - `QATC-3828` `[RENOBIT] 통합관리자 3.5.0`
+  - `QATC-3839` `[RENOBIT] 공통 3.5.0`
+  - `QATC-3902` `[RENOBIT] Manager 3.5.0`
+  - `QATC-3948` `[RENOBIT] Code box 3.5.0`
+  - `QATC-3997` `[RENOBIT] Page 3.5.0`
+- Generated: 2026-04-08
+- Note:
+  - Jira 하위 태스크의 `description` 필드는 대부분 비어 있었음.
+  - 아래 `Description`, `Preconditions`, `Expected Results`는 Jira 이슈 제목과 QA 문맥을 기준으로 보강 정리한 내용임.
+  - `Subtasks`는 Jira에 등록된 하위 TC를 그대로 정리한 목록임.
+
+## Epic 1. QATC-3828 [RENOBIT] 통합관리자 3.5.0
+
+### QATC-3829 admin
+- Status: Pass
+- Jira Description: 없음
+- Description:
+  - 통합관리자 화면의 기본 운영 기능을 점검하는 묶음이다.
+  - 언어 전환, 사용자/권한/라이선스/보안 정책/로그/폰트 관리까지 관리자 주요 메뉴 동작을 확인한다.
+- Preconditions:
+  - 통합관리자 접속 URL이 정상 동작해야 한다.
+  - 관리자 권한 계정으로 로그인 가능해야 한다.
+  - 사용자, 권한, 라이선스, 보안 정책 메뉴가 노출되어야 한다.
+- Expected Results:
+  - 관리자 상단 옵션과 좌측 메뉴가 정상 노출되어야 한다.
+  - 각 관리 화면 진입 시 목록, 버튼, 상세 패널이 정상 표시되어야 한다.
+  - 추가/삭제/설정 변경 후 오류 없이 반영되어야 한다.
+  - 언어 전환, 검색, 잠금, 정책 설정, 로그/폰트 조회가 정상 동작해야 한다.
+- Subtasks:
+  - `QATC-3830` 상단 옵션> 한국어 버튼 > 영어 - Pass
+    - Description: 상단 언어 옵션에서 영어 전환이 가능한지 확인한다.
+  - `QATC-3831` 상단 옵션 > 한국어 버튼 > 중국어(간체) - Pass
+    - Description: 상단 언어 옵션에서 중국어(간체) 전환이 가능한지 확인한다.
+  - `QATC-3832` 상단 옵션 > 한국어 버튼 > 중국어(번체) - Pass
+    - Description: 상단 언어 옵션에서 중국어(번체) 전환이 가능한지 확인한다.
+  - `QATC-3833` 사용자 관리 > 사용자 리스트 - Pass
+    - Description: 사용자 목록이 정상 조회되고 행이 표시되는지 확인한다.
+  - `QATC-3834` 사용자 관리 > 사용자 추가 버튼 - Pass
+    - Description: 사용자 추가 버튼이 정상 노출되고 추가 흐름으로 진입하는지 확인한다.
+  - `QATC-3835` 사용자 관리 > 계정 잠금 버튼 - Pass
+    - Description: 사용자 계정 잠금/해제 동작이 정상 반영되는지 확인한다.
+  - `QATC-3836` 권한 관리 > 리스트 추가/삭제 - Pass
+    - Description: 권한 목록 추가와 삭제가 정상 동작하는지 확인한다.
+  - `QATC-3837` 권한관리 > 권한별 설정 - Pass
+    - Description: 권한별 세부 설정이 정상 저장되고 반영되는지 확인한다.
+  - `QATC-3838` 권한 관리 > 사용자 추가/삭제 - Pass
+    - Description: 권한에 사용자 추가 및 삭제가 정상 동작하는지 확인한다.
+  - `QATC-3840` 라이선스 관리 - Pass
+    - Description: 라이선스 관리 화면과 기본 조회가 정상 동작하는지 확인한다.
+  - `QATC-3841` 보안 정책 관리 > 초기 비밀번호 옵션 - Pass
+    - Description: 초기 비밀번호 관련 보안 정책 옵션이 정상 반영되는지 확인한다.
+  - `QATC-3933` 개인 환경설정 > 개인정보 - Pass
+    - Description: 개인 정보 설정 화면과 데이터 수정이 정상 동작하는지 확인한다.
+  - `QATC-3936` 사용자 관리 > 사용자 검색 옵션 - Pass
+    - Description: 사용자 검색 조건과 결과 필터링이 정상 동작하는지 확인한다.
+  - `QATC-3940` 접속 이력 - Pass
+    - Description: 접속 이력 목록이 정상 조회되는지 확인한다.
+  - `QATC-3943` 라이선스 관리 > RENOBIT 탭 - Pass
+    - Description: 라이선스 관리의 RENOBIT 탭이 정상 노출되는지 확인한다.
+  - `QATC-3946` 접속 로그 - Pass
+    - Description: 접속 로그 목록과 상세 정보가 정상 표시되는지 확인한다.
+  - `QATC-3950` 접속로그 - Pass
+    - Description: 접속로그 화면이 정상 조회되고 로그 행이 표시되는지 확인한다.
+  - `QATC-3955` 폰트 관리 - Pass
+    - Description: 폰트 관리 화면이 정상 열리고 폰트 목록이 표시되는지 확인한다.
+  - `QATC-3959` 폰트 관리 - Pass
+    - Description: 폰트 관리 내 세부 동작이나 목록 갱신이 정상인지 확인한다.
+  - `QATC-3963` 폰트 관리 - Pass
+    - Description: 폰트 관리의 추가 세부 항목이 정상 노출되는지 확인한다.
+  - `QATC-3964` 보안 정책 관리 > 비밀번호 정책 > 최근 비밀번호 사용 제한 옵션 - Pass
+    - Description: 최근 비밀번호 재사용 제한 정책이 정상 저장되고 반영되는지 확인한다.
+
+### QATC-3969 호환성
+- Status: Pass
+- Jira Description: 없음
+- Description:
+  - RENOBIT와 통합관리자 간 세션 및 화면 이동 호환성을 확인하는 묶음이다.
+  - 선로그인 상태와 제품 간 전환 흐름이 끊기지 않는지 검증한다.
+- Preconditions:
+  - RENOBIT와 Admin이 동일 환경 또는 연동 환경에서 기동 중이어야 한다.
+  - 테스트 계정이 두 시스템 모두에서 유효해야 한다.
+- Expected Results:
+  - RENOBIT에서 Admin으로 이동 시 세션이 정상 이어져야 한다.
+  - RENOBIT 선로그인, Admin 선로그인 각각에서 추가 인증 오류 없이 이동 가능해야 한다.
+  - 권한 불일치나 세션 충돌이 발생하지 않아야 한다.
+- Subtasks:
+  - `QATC-3973` 페이지 이동 > RENOBIT to Admin - Pass
+    - Description: RENOBIT에서 Admin 화면으로의 페이지 이동이 정상 동작하는지 확인한다.
+  - `QATC-3976` 로그인 테스트 > RENOBIT 선 로그인 - Pass
+    - Description: RENOBIT 선로그인 상태에서 Admin 전환이 가능한지 확인한다.
+  - `QATC-3979` 로그인 테스트 > Admin 선 로그인 - Pass
+    - Description: Admin 선로그인 상태에서 RENOBIT 전환이 가능한지 확인한다.
+
+## Epic 2. QATC-3839 [RENOBIT] 공통 3.5.0
+
+### QATC-3842 공통
+- Status: Pass
+- Jira Description: 없음
+- Description:
+  - RENOBIT 에디터의 공통 프레임, 상단 링크, 레이어/뷰 전환, 줌, 메뉴 패널, 언어 설정, SSO/Lock 관련 기본 동작을 확인하는 묶음이다.
+- Preconditions:
+  - RENOBIT 3.5.0 환경이 정상 기동 중이어야 한다.
+  - 에디터 진입 가능한 계정이 준비되어야 한다.
+  - SSO/Lock 관련 항목은 계정 상태 변경이 가능한 테스트 환경이어야 한다.
+- Expected Results:
+  - 로그아웃, 통합관리자 링크, 뷰어 링크가 정상 동작해야 한다.
+  - 메뉴 패널, 레이어 툴바, 2D/3D View 전환, Zoom 상태 표시가 정상이어야 한다.
+  - 언어 변경 시 UI 텍스트가 일관되게 반영되어야 한다.
+  - SSO 및 Lock 상태 변경 후 접근 제어 결과가 기대와 일치해야 한다.
+  - WAR 업데이트 후 기본 화면과 핵심 메뉴 동작이 유지되어야 한다.
+- Subtasks:
+  <!-- - `QATC-3844` War 업데이트 - Pass
+    - Description:
+      - WAR 배포 후 RENOBIT 기본 화면과 핵심 메뉴가 정상 유지되는지 확인하는 항목이다.
+    - Preconditions:
+      - WAR 배포가 가능한 테스트 환경이어야 한다.
+      - 기존 세션 및 캐시 영향이 없도록 새 배포 후 기동 상태여야 한다.
+    - Expected Results:
+      - 배포 후 로그인, 에디터 진입, 주요 메뉴 노출이 정상이어야 한다.
+      - 화면이 깨지거나 정적 리소스 누락이 없어야 한다.
+      - 기존 공통 기능이 회귀 없이 동작해야 한다.
+  - `QATC-3847` SSO sign_id Lock - tb_user table > Lock 컬럼 N > Y - Pass
+    - Jira Description:
+      - Pre-condition: `{renobit}\WEB-INF\classes\wembframework\spring\com\context-security.xml` 에서 `<intercept-url pattern="/api/sso/*" access="permitAll" />` 주석을 해제한다.
+      - Admin 테스트 시에도 동일하게 해당 주석 상태를 맞춘다.
+      - Test step: Postman으로 `POST /renobit/api/sso/pre-persist` 를 호출해 `sign_id=admin` 으로 사전 로그인한다.
+      - Expected result: SSO 사전 인증이 정상 처리되고, 이후 `/renobit/api/sso/login` 호출이 가능해야 한다.
+  - `QATC-3849` SSO sign_id Lock - tb_user table > Lock 컬럼 Y > N - Pass
+    - Jira Description:
+      - Pre-condition: `tb_user.lock` 값을 `Y` 에서 `N` 으로 변경한다.
+      - Admin 테스트 시에도 동일하게 대상 환경과 경로를 맞춘다.
+      - Test step: Postman API로 SSO 로그인 흐름을 재호출한다.
+      - Expected result: Lock 해제 상태에서 SSO 로그인과 `pre-persist` / `login` 호출이 정상 동작해야 한다. -->
+  - `QATC-3852` 메뉴 영역 -패널 확인 - Pass
+    - Description:
+      - 에디터 좌측 또는 상단 메뉴 패널이 정상 노출되는지 확인한다.
+    - Preconditions:
+      - 에디터가 정상 로딩되어야 한다.
+    - Expected Results:
+      - 메뉴 영역이 기본 상태로 보이고 클릭 가능한 상태여야 한다.
+      - 패널이 잘리지 않고 정상 렌더링되어야 한다.
+  - `QATC-3854` 로그아웃 - Pass
+    - Description:
+      - 현재 세션을 종료하는 로그아웃 링크 동작을 확인한다.
+    - Preconditions:
+      - 로그인된 세션이 존재해야 한다.
+    - Expected Results:
+      - 로그아웃 후 로그인 화면 또는 재인증 흐름으로 이동해야 한다.
+      - 기존 편집 세션은 남지 않아야 한다.
+  - `QATC-3856` 통합 관리자 링크 - Pass
+    - Description:
+      - 에디터에서 통합관리자 화면으로 이동하는 링크를 확인한다.
+    - Preconditions:
+      - 통합관리자 접근 권한이 있어야 한다.
+    - Expected Results:
+      - 링크 클릭 시 통합관리자 화면으로 정상 이동해야 한다.
+      - 새 창 또는 동일 창 이동 정책이 기대와 일치해야 한다.
+  - `QATC-3858` 뷰어 링크 - Pass
+    - Description:
+      - 에디터에서 뷰어 화면으로 이동하는 링크를 확인한다.
+    - Preconditions:
+      - 뷰어 접근이 가능한 페이지가 존재해야 한다.
+    - Expected Results:
+      - 링크 클릭 시 Viewer 화면으로 정상 이동해야 한다.
+      - 현재 페이지 상태가 뷰어에서 정상 표시되어야 한다.
+  - `QATC-3860` 페이지 수정 중 언어 설정 - Pass
+    - Description:
+      - 페이지 편집 중 언어 설정이 가능한지 확인한다.
+    - Preconditions:
+      - 다국어 또는 언어 전환이 가능한 페이지가 열려 있어야 한다.
+    - Expected Results:
+      - 언어 설정 변경 시 UI 문자열이 지정 언어로 바뀌어야 한다.
+      - 편집 상태가 유지되어야 한다.
+  - `QATC-3863` 줌 버튼- Zoom 활성화 - Pass
+    - Description:
+      - 줌 기능이 활성화 상태로 동작하는지 확인한다.
+    - Preconditions:
+      - 에디터 화면이 정상 노출되어야 한다.
+    - Expected Results:
+      - Zoom 컨트롤이 활성 상태로 표시되어야 한다.
+      - 확대/축소 동작이 정상 반영되어야 한다.
+  - `QATC-3865` 메뉴 토글바 - Pass
+    - Description:
+      - 메뉴 토글바를 통해 좌우 메뉴 또는 패널 가시성을 조절할 수 있는지 확인한다.
+    - Preconditions:
+      - 토글 가능한 메뉴 패널이 있어야 한다.
+    - Expected Results:
+      - 클릭 시 메뉴 패널이 접히거나 펼쳐져야 한다.
+  - `QATC-3868` 레이어 툴바 - Layer - Pass
+    - Description:
+      - Layer 레이어 선택/전환 기능을 확인한다.
+    - Preconditions:
+      - 레이어 툴바가 노출되어야 한다.
+    - Expected Results:
+      - Layer 버튼이 활성화되고 현재 레이어 상태가 반영되어야 한다.
+  - `QATC-3871` 레이어 툴바 - View(2D) - Pass
+    - Description:
+      - 2D View 전환 기능을 확인한다.
+    - Preconditions:
+      - 에디터가 2D/3D 전환을 지원해야 한다.
+    - Expected Results:
+      - View(2D) 선택 시 2D 상태로 전환되어야 한다.
+  - `QATC-3874` 레이어 툴바 - View(3D) - Pass
+    - Description:
+      - 3D View 전환 기능을 확인한다.
+    - Preconditions:
+      - 3D 보기 가능한 페이지 또는 상태여야 한다.
+    - Expected Results:
+      - View(3D) 선택 시 3D 상태로 전환되어야 한다.
+  - `QATC-3877` 줌 버튼- Zoom 비활성화 - Pass
+    - Description:
+      - 줌 기능이 비활성화 상태로 전환되는지 확인한다.
+    - Preconditions:
+      - 에디터 화면이 정상 노출되어야 한다.
+    - Expected Results:
+      - Zoom 컨트롤이 비활성 상태로 표시되어야 한다.
+  <!-- - `QATC-3880` 메뉴 영역 - 패널 클릭 - Pass
+    - Description:
+      - 메뉴 영역의 패널 클릭 시 선택/전환이 정상 동작하는지 확인한다.
+    - Preconditions:
+      - 메뉴 패널 항목이 표시되어야 한다.
+    - Expected Results:
+      - 클릭한 패널이 활성화되어야 한다.
+      - 관련 화면 또는 옵션이 변경되어야 한다.
+  - `QATC-3883` 언어 설정 - Pass
+    - Description:
+      - 기본 언어 설정 및 변경이 정상 동작하는지 확인한다.
+    - Preconditions:
+      - 언어 선택 UI가 노출되어야 한다.
+    - Expected Results:
+      - 선택한 언어가 UI 전역에 반영되어야 한다.
+  - `QATC-3887` SSO 토큰 - Lock - tb_user table > Lock 컬럼 N > Y - Pass
+    - Description:
+      - SSO 토큰의 Lock 상태를 `N -> Y` 로 변경했을 때 접근 제어가 정상 적용되는지 확인한다.
+    - Preconditions:
+      - `tb_user` 테이블의 Lock 컬럼을 수정할 수 있어야 한다.
+      - SSO 테스트 엔드포인트가 허용되어야 한다.
+    - Expected Results:
+      - Lock 변경 후 SSO 로그인 정책이 Y 상태에 맞게 제한되어야 한다.
+      - 토큰 기반 접근이 기대와 일치해야 한다.
+  - `QATC-3891` SSO 토큰 - Lock - tb_user table > Lock 컬럼 Y > N - Pass
+    - Description:
+      - SSO 토큰의 Lock 상태를 `Y -> N` 으로 복구했을 때 접근이 다시 허용되는지 확인한다.
+    - Preconditions:
+      - `tb_user` 테이블의 Lock 컬럼을 수정할 수 있어야 한다.
+      - SSO 테스트 엔드포인트가 허용되어야 한다.
+    - Expected Results:
+      - Lock 해제 후 토큰 기반 접근이 정상 허용되어야 한다.
+      - 기존 제한이 남아있지 않아야 한다. -->
+
+### QATC-3894 로그인
+- Status: Pass
+- Jira Description: 없음
+- Description:
+  - 로그인 페이지 구성과 뷰어/에디터 권한별 접근 가능 여부를 검증하는 묶음이다.
+- Preconditions:
+  - 로그인 페이지 접속이 가능해야 한다.
+  - 로그인 가능/불가 계정, Edit 권한 유무가 다른 계정이 준비되어야 한다.
+- Expected Results:
+  - 로그인 페이지의 필수 입력요소와 옵션이 정상 노출되어야 한다.
+  - 뷰어 권한 계정은 뷰어 로그인 정책에 맞게 동작해야 한다.
+  - Edit 권한이 있는 계정만 에디터 진입이 가능해야 한다.
+  - 권한이 없는 계정은 적절히 차단되거나 안내되어야 한다.
+- Subtasks:
+  - `QATC-3898` 페이지 구성 - Pass
+    - Description:
+      - 로그인 페이지의 기본 레이아웃과 입력 요소 구성을 확인한다.
+    - Preconditions:
+      - 로그인 페이지 URL에 접근 가능해야 한다.
+    - Expected Results:
+      - 아이디/비밀번호 입력 필드와 에디터 체크가 보여야 한다.
+      - 로그인 버튼이 정상 노출되어야 한다.
+  - `QATC-3901` 뷰어 로그인 - 로그인 불가 계정 - Pass
+    - Description:
+      - 뷰어 권한이 없는 계정의 로그인 차단 여부를 확인한다.
+    - Preconditions:
+      - 뷰어 불가 계정이 준비되어야 한다.
+    - Expected Results:
+      - 뷰어 로그인 시도 시 차단 또는 안내가 표시되어야 한다.
+  - `QATC-3905` 뷰어 로그인 - 로그인 가능 계정 - Pass
+    - Description:
+      - 뷰어 권한이 있는 계정의 정상 로그인을 확인한다.
+    - Preconditions:
+      - 뷰어 권한 계정이 준비되어야 한다.
+    - Expected Results:
+      - 뷰어로 정상 진입해야 한다.
+  - `QATC-3909` 에디터 로그인 - Edit권한이 있는 계정 - Pass
+    - Description:
+      - Edit 권한이 있는 계정이 에디터로 진입 가능한지 확인한다.
+    - Preconditions:
+      - Edit 권한 계정이 준비되어야 한다.
+    - Expected Results:
+      - 에디터가 정상 열려야 한다.
+  - `QATC-3912` 에디터 로그인 - Edit권한이 없는 계정 - Pass
+    - Description:
+      - Edit 권한이 없는 계정의 에디터 진입 차단 여부를 확인한다.
+    - Preconditions:
+      - Edit 권한이 없는 계정이 준비되어야 한다.
+    - Expected Results:
+      - 에디터 진입이 차단되거나 권한 안내가 표시되어야 한다.
+
+## Epic 3. QATC-3902 [RENOBIT] Manager 3.5.0
+
+### QATC-3906 2d_pack 업로드
+- Status: Pass
+- Jira Description: 없음
+- Description:
+  - Manager 영역에서 2d_pack 업로드 UI와 기본 상호작용을 점검하는 묶음이다.
+- Preconditions:
+  - Manager 진입 권한이 있어야 한다.
+  - 2d_pack 관리 화면이 정상 노출되어야 한다.
+- Expected Results:
+  - 업로드 대상 리스트와 업로드 관련 UI가 정상 노출되어야 한다.
+  - 마우스 오버 시 툴팁 또는 강조 상태가 기대대로 표시되어야 한다.
+- Subtasks:
+  - `QATC-3910` 마우스 오버 - Pass
+    - Description: 2d_pack 항목 위에 마우스를 올렸을 때 강조나 툴팁이 표시되는지 확인한다.
+
+### QATC-3914 Dataset Manager
+- Status: Pass
+- Jira Description: 없음
+- Description:
+  - Dataset Manager의 가져오기/내보내기/생성/수정/검색/복제/삭제 및 타입별 옵션 구성을 점검하는 묶음이다.
+- Preconditions:
+  - Dataset Manager 페이지에 접근 가능해야 한다.
+  - 테스트용 dataset 파일과 생성 가능한 사용자 권한이 준비되어야 한다.
+  - DB Query, TIM, REST API 입력값 검증이 가능한 테스트 환경이어야 한다.
+- Expected Results:
+  - 파일 가져오기/내보내기 기능이 정상 수행되어야 한다.
+  - DB Query, TIM, REST API 타입 선택 시 해당 입력 필드가 정확히 노출되어야 한다.
+  - Static/Dynamic, Credentials, TIM URL/Worker 등 세부 옵션이 정상 동작해야 한다.
+  - Help, 검색, 수정, 복제, 삭제가 오류 없이 반영되어야 한다.
+  - 데이터셋 명, 설명, 주기, 최초 한번 실행 등 기본 필드 입력이 정상 저장되어야 한다.
+- Subtasks:
+  - `QATC-3917` 파일 내보내기 - Pass
+    - Description: 데이터셋 파일을 외부로 내보내는 흐름이 정상 동작하는지 확인한다.
+  - `QATC-3921` 파일 가져오기 - Pass
+    - Description: 외부 파일을 불러와 데이터셋 목록에 반영할 수 있는지 확인한다.
+  - `QATC-3925` 데이터셋 생성 > 타입 > DB Query - Pass
+    - Description: DB Query 타입 데이터셋 생성 진입과 기본 타입 선택이 되는지 확인한다.
+  - `QATC-3928` 데이터셋 생성 > 타입 > TIM - Pass
+    - Description: TIM 타입 데이터셋 생성 진입과 타입 선택이 되는지 확인한다.
+  - `QATC-3931` 데이터셋 생성 > 타입 > REST API - Pass
+    - Description: REST API 타입 데이터셋 생성 진입과 타입 선택이 되는지 확인한다.
+  - `QATC-3935` 데이터셋 생성 > DB Query > Static - Pass
+    - Description: DB Query의 Static 모드와 정적 쿼리 구성이 가능한지 확인한다.
+  - `QATC-3939` 데이터셋 생성 > DB Query > Dynamic - Pass
+    - Description: DB Query의 Dynamic 모드와 동적 파라미터 구성이 가능한지 확인한다.
+  - `QATC-3942` 데이터셋 생성 > TIM > TIM URL 선택 - Pass
+    - Description: TIM 데이터셋에서 URL 선택 옵션이 정상 동작하는지 확인한다.
+  - `QATC-3945` 데이터셋 생성 > TIM > TIM Worker 선택 - Pass
+    - Description: TIM Worker 선택 옵션이 정상 동작하는지 확인한다.
+  - `QATC-3949` 데이터셋 생성 > TIM > TIM Worker URL - Pass
+    - Description: TIM Worker URL 입력 및 반영이 가능한지 확인한다.
+  - `QATC-3953` 데이터셋 생성 > REST API > Credentials - Pass
+    - Description: REST API 자격 증명 입력과 적용이 가능한지 확인한다.
+  - `QATC-3978` 환경 설정 > 삭제 - Pass
+    - Description: 데이터셋 환경 설정 삭제 동작이 정상 반영되는지 확인한다.
+  - `QATC-3982` 데이터셋 생성 > 타입 > REST API - Pass
+    - Description: REST API 타입 선택 후 관련 입력 필드가 표시되는지 확인한다.
+  - `QATC-3985` Help - Pass
+    - Description: Dataset Manager의 도움말 진입이 정상 동작하는지 확인한다.
+  - `QATC-3989` 검색 - Pass
+    - Description: 데이터셋 검색어 입력 시 결과가 필터링되는지 확인한다.
+  - `QATC-3992` 수정 - Pass
+    - Description: 기존 데이터셋 수정 후 변경 사항이 반영되는지 확인한다.
+  - `QATC-3995` 복제 - Pass
+    - Description: 선택한 데이터셋을 복제 생성할 수 있는지 확인한다.
+  - `QATC-3999` 삭제 - Pass
+    - Description: 선택한 데이터셋 삭제가 정상 수행되는지 확인한다.
+  - `QATC-4005` 데이터셋 생성 > 데이터셋 명 - Pass
+    - Description: 데이터셋 명 입력 필드가 정상 동작하는지 확인한다.
+  - `QATC-4009` 데이터셋 생성 > 설명 - Pass
+    - Description: 데이터셋 설명 입력 필드가 정상 동작하는지 확인한다.
+  - `QATC-4013` 데이터셋 생성 > 주기 - Pass
+    - Description: 데이터셋 실행 주기 입력이 정상 동작하는지 확인한다.
+  - `QATC-4017` 데이터셋 생성 > 주기 > 최초 한번 실행 - Pass
+    - Description: 최초 1회 실행 옵션이 정상 선택되고 저장되는지 확인한다.
+
+### QATC-4021 Resource Manager
+- Status: Pass
+- Jira Description: 없음
+- Description:
+  - Resource Manager의 리소스 타입별 이미지 선택 및 적용 동작을 점검하는 묶음이다.
+- Preconditions:
+  - Resource Manager 접근 권한이 있어야 한다.
+  - 이미지, zip, gltf, lottie, hdr 등 테스트 리소스 파일이 준비되어야 한다.
+- Expected Results:
+  - 각 탭에서 파일 선택 UI가 정상 동작해야 한다.
+  - 선택한 리소스가 미리보기 또는 리스트에 정상 반영되어야 한다.
+  - 적용 후 저장/반영 메시지 또는 화면 상태가 정상 갱신되어야 한다.
+- Subtasks:
+  - `QATC-4023` Image > 이미지 선택 - Pass
+    - Description: Image 탭에서 이미지 파일 선택이 정상 동작하는지 확인한다.
+  - `QATC-4027` Image > 적용 - Pass
+    - Description: 선택한 이미지가 적용되고 목록에 반영되는지 확인한다.
+  - `QATC-4031` Background > 이미지 선택 - Pass
+    - Description: Background 탭에서 배경 이미지 선택이 정상 동작하는지 확인한다.
+  - `QATC-4036` Background > 적용 - Pass
+    - Description: 배경 이미지 적용 후 상태가 반영되는지 확인한다.
+  - `QATC-4041` Icons > 이미지 선택 - Pass
+    - Description: Icons 탭에서 아이콘 이미지 선택이 정상 동작하는지 확인한다.
+  - `QATC-4045` Icons > 적용 - Pass
+    - Description: 선택한 아이콘이 적용되는지 확인한다.
+  - `QATC-4049` Button Images > 이미지 선택 - Pass
+    - Description: Button Images 탭에서 버튼 이미지 선택이 정상 동작하는지 확인한다.
+  - `QATC-4053` Button Images > 적용 - Pass
+    - Description: 선택한 버튼 이미지가 적용되는지 확인한다.
+  - `QATC-4056` Sprite Clip > 이미지 선택 - Pass
+    - Description: Sprite Clip용 이미지 선택이 정상 동작하는지 확인한다.
+  - `QATC-4060` Sprite Clip > 적용 - Pass
+    - Description: Sprite Clip 설정이 적용되는지 확인한다.
+  - `QATC-4063` State Clip > 이미지 선택 - Pass
+    - Description: State Clip 파일 선택이 정상 동작하는지 확인한다.
+  - `QATC-4069` State Clip > 적용 - Pass
+    - Description: 선택한 State Clip이 적용되는지 확인한다.
+  - `QATC-4074` GLTF - Pass
+    - Description: GLTF 리소스 선택 UI가 정상 노출되는지 확인한다.
+  - `QATC-4077` GLTF > 적용 - Pass
+    - Description: GLTF 리소스가 적용되는지 확인한다.
+  - `QATC-4080` Lottie - Pass
+    - Description: Lottie 리소스 선택 UI가 정상 노출되는지 확인한다.
+  - `QATC-4085` Lottie > 적용 - Pass
+    - Description: Lottie 리소스가 적용되는지 확인한다.
+  - `QATC-4088` HDR - Pass
+    - Description: HDR 리소스 선택 UI가 정상 노출되는지 확인한다.
+  - `QATC-4092` HDR > 적용 - Pass
+    - Description: HDR 리소스가 적용되는지 확인한다.
+  - `QATC-4095` Asset Resource GLTF - DCIM - Pass
+    - Description: Asset Resource GLTF의 DCIM 자원 선택이 가능한지 확인한다.
+  - `QATC-4098` Asset Resource GLTF - DCIM > 적용 - Pass
+    - Description: DCIM GLTF 자원이 적용되는지 확인한다.
+
+<!-- ### QATC-4101 Template Manager
+- Status: Pass
+- Jira Description: 없음
+- Description:
+  - Template Manager의 가져오기/내보내기와 Add 흐름을 점검하는 묶음이다.
+- Preconditions:
+  - Template Manager 진입이 가능해야 한다.
+  - 가져오기/내보내기 대상 템플릿 데이터가 준비되어야 한다.
+- Expected Results:
+  - 가져오기 버튼이 정상 동작해야 한다.
+  - 내보내기 버튼 활성화 조건이 올바르게 반영되어야 한다.
+  - Add 후 Export 영상 생성 또는 추가 동작이 오류 없이 수행되어야 한다.
+- Subtasks:
+  - `QATC-4104` 가져오기 - Pass
+    - Description: 템플릿 파일을 가져와 목록에 반영하는 흐름을 확인한다.
+  - `QATC-4107` 내보내기> 버튼 활성화 - Pass
+    - Description: 내보내기 버튼이 활성화 조건에 맞게 동작하는지 확인한다.
+  - `QATC-4110` 내보내기 > Add > Export 영상 생성 - Pass
+    - Description: Add 후 Export 영상 생성 흐름이 정상 실행되는지 확인한다.
+  - `QATC-4112` 내보내기 > Add - Pass
+    - Description: Add 버튼으로 내보내기 항목을 추가할 수 있는지 확인한다. -->
+
+### QATC-4115 Language Manager
+- Status: Pass
+- Jira Description: 없음
+- Description:
+  - 다국어 에디터 페이지의 Add, Import, Export, Delete, Edit, Clipboard 기능을 점검하는 묶음이다.
+- Preconditions:
+  - `multilingualEditor` 페이지 접근이 가능해야 한다.
+  - 다국어 리소스 편집 권한이 있어야 한다.
+- Expected Results:
+  - Add, File Import, File Export, Delete, Delete All, Edit, Copy to clipboard 버튼이 정상 동작해야 한다.
+  - 편집/삭제 후 목록과 편집 상태가 정확히 반영되어야 한다.
+- Subtasks:
+  - `QATC-4119` 다국어 에디터 페이지 multilingualEditor > Add Button - Pass
+    - Description: 다국어 항목을 새로 추가하는 버튼 동작을 확인한다.
+  - `QATC-4122` 다국어 에디터 페이지 multilingualEditor > File Import 버튼 - Pass
+    - Description: 다국어 파일 import가 정상 동작하는지 확인한다.
+  - `QATC-4125` 다국어 에디터 페이지 multilingualEditor > File Export 버튼 - Pass
+    - Description: 다국어 파일 export가 정상 동작하는지 확인한다.
+  - `QATC-4128` 다국어 에디터 페이지 multilingualEditor > Delete 버튼 - Pass
+    - Description: 선택한 다국어 항목 삭제가 정상 동작하는지 확인한다.
+  - `QATC-4131` 다국어 에디터 페이지 multilingualEditor > Delete All 버튼 - Pass
+    - Description: 전체 다국어 항목 삭제가 정상 동작하는지 확인한다.
+  - `QATC-4135` 다국어 에디터 페이지 multilingualEditor > Edit 버튼 - Pass
+    - Description: 다국어 항목 편집 진입과 수정이 가능한지 확인한다.
+  - `QATC-4138` 다국어 에디터 페이지 multilingualEditor > Copy to clipboard - Pass
+    - Description: 다국어 문자열을 클립보드에 복사할 수 있는지 확인한다.
+
+## Epic 4. QATC-3948 [RENOBIT] Code box 3.5.0
+
+### QATC-3952 Side list edit-aside-list 선택
+- Status: Pass
+- Jira Description: 없음
+- Description:
+  - Code box 진입 전 사이드 리스트 영역의 기본 구성과 선택 동작을 확인하는 묶음이다.
+- Preconditions:
+  - Code box 기능이 포함된 페이지 또는 인스턴스가 준비되어야 한다.
+- Expected Results:
+  - 사이드 리스트가 정상 노출되어야 한다.
+  - 대상 항목 선택 시 상세 편집 영역과 연결되어야 한다.
+- Subtasks:
+  - `QATC-3956` Side list 구성 - Pass
+    - Description: Code box 진입 전 사이드 리스트가 구성되고 선택 가능한지 확인한다.
+
+### QATC-3960 Instance List
+- Status: Pass
+- Jira Description: 없음
+- Description:
+  - Instance List에서 컴포넌트별 Code box 기본 코드, 수정, Apply, Format code, Sample snippet, SVG style 옵션을 점검하는 묶음이다.
+- Preconditions:
+  - Code box 편집 대상 인스턴스(TabulatorTable, Echart, images 등)가 포함된 페이지가 준비되어야 한다.
+  - Code box 편집기와 Preview가 정상 열려야 한다.
+- Expected Results:
+  - 리스트 노출 및 검색이 정상 동작해야 한다.
+  - 기본 코드 로딩, Apply, Format code가 정상 수행되어야 한다.
+  - SVG style 색상/애니메이션 옵션이 올바르게 반영되어야 한다.
+  - 실패 항목이 있으면 해당 인스턴스/옵션에서 재현 가능해야 한다.
+- Subtasks:
+  - `QATC-3966` 리스트 노출 - Pass
+    - Description: 인스턴스 목록이 정상 표시되는지 확인한다.
+  - `QATC-3971` 검색 - Pass
+    - Description: 인스턴스 목록 검색이 정상 동작하는지 확인한다.
+  - `QATC-3975` TabulatorTable_1 > CSS Editor / JAVASCRIPT Editor 기본 - Fail
+    - Description: TabulatorTable_1의 기본 CSS/JS 코드가 정상 로딩되는지 확인한다.
+  - `QATC-3980` TabulatorTable_1 > CSS Editor / JAVASCRIPT Editor 수정 후 Apply - Pass
+    - Description: TabulatorTable_1 코드 수정 후 Apply 반영을 확인한다.
+  - `QATC-3984` TabulatorTable_1 > CSS Editor / JAVASCRIPT Editor 수정 후 Format code - Pass
+    - Description: TabulatorTable_1 코드 포맷 정렬이 정상 동작하는지 확인한다.
+  - `QATC-3987` Echart_1 > CSS Editor / JAVASCRIPT Editor 기본 - Pass
+    - Description: Echart_1의 기본 CSS/JS 코드 로딩을 확인한다.
+  - `QATC-3990` Echart_1 > CSS Editor / JAVASCRIPT Editor 수정 후 Apply - Pass
+    - Description: Echart_1 코드 수정 후 Apply 반영을 확인한다.
+  - `QATC-3994` Echart_1 > CSS Editor / JAVASCRIPT Editor 수정 후 Format code - Pass
+    - Description: Echart_1 코드 포맷 정렬이 정상 동작하는지 확인한다.
+  - `QATC-3998` images_1 > HTML / CSS Editor / JAVASCRIPT Editor 기본 - Pass
+    - Description: images_1의 HTML/CSS/JS 기본 코드가 정상 로딩되는지 확인한다.
+  - `QATC-4002` images_1 > HTML / CSS Editor / JAVASCRIPT Editor 수정 후 Apply - Pass
+    - Description: images_1 코드 수정 후 Apply 반영을 확인한다.
+  - `QATC-4006` images_1 > HTML / CSS Editor / JAVASCRIPT Editor 수정 후 Format code - Pass
+    - Description: images_1 코드 포맷 정렬이 정상 동작하는지 확인한다.
+  - `QATC-4153` Sample Code Snippet > 목록 내 컴포넌트 존재/클릭 시 - Pass
+    - Description: 샘플 코드 스니펫 목록의 컴포넌트가 존재하고 선택 가능한지 확인한다.
+  - `QATC-4155` SVG style > Color Theme > Mask - Pass
+    - Description: SVG 스타일 색상 테마의 Mask 옵션을 확인한다.
+  - `QATC-4158` SVG style > Color Theme > Hex - Pass
+    - Description: SVG 스타일 색상 테마의 Hex 옵션을 확인한다.
+  - `QATC-4160` SVG style > Color Theme > RGB - Pass
+    - Description: SVG 스타일 색상 테마의 RGB 옵션을 확인한다.
+  - `QATC-4162` SVG style > Color Theme > Color Matrix - Pass
+    - Description: SVG 스타일 색상 매트릭스 옵션을 확인한다.
+  - `QATC-4164` SVG style > Color Theme > Event Color - Pass
+    - Description: 이벤트 색상 옵션이 정상 반영되는지 확인한다.
+  - `QATC-4166` SVG style > Color Theme > Gradient - Pass
+    - Description: SVG 그래디언트 색상 옵션을 확인한다.
+  - `QATC-4168` SVG style > Animation > blink - Pass
+    - Description: blink 애니메이션 옵션이 정상 동작하는지 확인한다.
+  - `QATC-4171` SVG style > Animation > pulse - Pass
+    - Description: pulse 애니메이션 옵션이 정상 동작하는지 확인한다.
+  - `QATC-4173` SVG style > Animation > rotate - Pass
+    - Description: rotate 애니메이션 옵션이 정상 동작하는지 확인한다.
+  - `QATC-4175` SVG style > Animation > animate tag - Pass
+    - Description: animate tag 기반 애니메이션이 정상 적용되는지 확인한다.
+
+### QATC-4177 </> 클릭 Code box
+- Status: Pass
+- Jira Description: 없음
+- Description:
+  - `</>` 버튼으로 Code box 화면을 여는 진입 동작을 확인하는 묶음이다.
+- Preconditions:
+  - Code box를 열 수 있는 페이지 또는 편집 대상 인스턴스가 선택되어야 한다.
+- Expected Results:
+  - `</>` 클릭 시 Code box 페이지 또는 팝업이 정상 열려야 한다.
+  - 현재 선택 인스턴스/페이지와 연계된 편집 상태가 유지되어야 한다.
+- Subtasks:
+  - `QATC-4179` 페이지 - Pass
+    - Description: Code box 전용 페이지 또는 팝업 진입이 정상 동작하는지 확인한다.
+
+### QATC-4182 헤더
+- Status: Pass
+- Jira Description: 없음
+- Description:
+  - Code box 상단 헤더 영역의 식별 정보, Format code, Apply, 이탈/저장 동작을 확인하는 묶음이다.
+- Preconditions:
+  - Code box가 정상 열려 있어야 한다.
+  - 편집 가능한 코드가 로드되어야 한다.
+- Expected Results:
+  - Instance Name/Id가 정확히 표시되어야 한다.
+  - Format code가 코드 정렬에 정상 반영되어야 한다.
+  - 정상 코드 Apply는 반영되어야 하고, 비정상 코드는 오류 처리되어야 한다.
+  - 편집 중 이탈과 페이지 저장 시 경고/저장 흐름이 기대대로 동작해야 한다.
+- Subtasks:
+  - ctrl + shift + u 단축키로 코드박스 잠금 해제
+  - `QATC-4184` Instance Name & Id - Pass
+    - Description: 현재 선택된 인스턴스의 이름과 ID가 정확히 표시되는지 확인한다.
+  - `QATC-4186` Format code - Pass
+    - Description: 코드 포맷 정렬 기능이 정상 동작하는지 확인한다.
+  - `QATC-4188` Apply > 정상 코드 작성 - Pass
+    - Description: 정상 코드 작성 후 Apply가 반영되는지 확인한다.
+  - `QATC-4191` Apply > 비정상 코드 작성 - Pass
+    - Description: 잘못된 코드 입력 시 오류 처리되는지 확인한다.
+  - `QATC-4193` Apply > 편집 중 이탈 - Pass
+    - Description: 편집 중 다른 화면으로 이탈할 때 경고 또는 보존 동작을 확인한다.
+  - `QATC-4194` Apply > 페이지 저장 - Pass
+    - Description: Apply 후 페이지 저장 흐름이 정상 동작하는지 확인한다.
+
+### QATC-4195 Box 영역
+- Status: Pass
+- Jira Description: 없음
+- Description:
+  - Code box 본문 편집 영역에서 HTML/CSS/JS 입력, Preview, Viewer 반영, 인스턴스 아이디 활용을 확인하는 묶음이다.
+- Preconditions:
+  - Code box 편집기가 열려 있어야 한다.
+  - Preview/Viewer 확인이 가능한 페이지가 준비되어야 한다.
+- Expected Results:
+  - HTML, CSS, JS 각 조합별 코드 입력이 정상 가능해야 한다.
+  - Preview가 실시간으로 갱신되어야 한다.
+  - Apply 또는 저장 후 Viewer에도 변경 내용이 반영되어야 한다.
+  - 인스턴스 아이디를 활용한 코드가 정상 참조되어야 한다.
+- Subtasks:
+  - `QATC-4196` HTML, CSS, JS 코드 작성 - Pass
+    - Description: HTML, CSS, JS 조합 코드 작성이 가능한지 확인한다.
+  - `QATC-4197` CSS와 JS 코드 작성 - Pass
+    - Description: CSS와 JS만으로도 코드 작성이 가능한지 확인한다.
+  - `QATC-4198` JS 코드 작성 - Pass
+    - Description: JS 단독 코드 작성이 가능한지 확인한다.
+  - `QATC-4199` Preview 미리보기 > 실시간 코드 실행 - Pass
+    - Description: Preview가 실시간으로 코드 실행 결과를 반영하는지 확인한다.
+  - `QATC-4200` Preview 미리보기 > Viewer 반영 - Pass
+    - Description: Preview 변경 내용이 Viewer에도 반영되는지 확인한다.
+  - `QATC-4201` 코드 활용 > 인스턴스 아이디 활용 - Pass
+    - Description: 인스턴스 ID를 이용한 코드 참조가 정상 동작하는지 확인한다.
+
+## Epic 5. QATC-3997 [RENOBIT] Page 3.5.0
+
+### QATC-4001 Master Page 저장 옵션
+- Status: Pass
+- Jira Description: 없음
+- Description:
+  - Master Page와 일반 Page 저장 시 참조 페이지/마스터 페이지 포함 여부에 따른 옵션 동작을 점검하는 묶음이다.
+- Preconditions:
+  - 일반 Page와 Master Page가 준비되어 있어야 한다.
+  - Refer Page 및 Master Page 지정 상태를 변경할 수 있어야 한다.
+- Expected Results:
+  - 저장 옵션 셀렉트박스가 정상 노출되어야 한다.
+  - Refer Page 선택/미선택에 따라 저장 동작이 기대와 일치해야 한다.
+  - 일반 Page의 마스터 포함 옵션 체크 유무에 따라 결과가 정확히 반영되어야 한다.
+- Subtasks:
+  - `QATC-4003` Master Page - 셀렉트박스 - Pass
+    - Description: Master Page 저장 옵션에서 셀렉트박스가 정상 노출되는지 확인한다.
+  - `QATC-4008` Master Page - Refer Page 미선택 - Pass
+    - Description: Refer Page를 선택하지 않은 상태의 저장 동작을 확인한다.
+  - `QATC-4012` Master Page - Refer Page 선택 - Pass
+    - Description: Refer Page를 선택한 상태의 저장 동작을 확인한다.
+  - `QATC-4016` 일반 Page - Mastert Page 지정 되어있는 경우 - Pass
+    - Description: 일반 Page에 Master Page가 지정된 경우의 저장 반영을 확인한다.
+  - `QATC-4020` 일반 Page - Mastert Page 지정 되어있는 경우 (마스터페이지 포함 지정 체크 해제) - Pass
+    - Description: 마스터 포함 옵션을 해제한 일반 Page 저장을 확인한다.
+  - `QATC-4025` 일반 Page - Mastert Page 지정 되어있는 경우 (마스터페이지 포함 지정 체크) - Pass
+    - Description: 마스터 포함 옵션을 체크한 일반 Page 저장을 확인한다.
+  - `QATC-4029` 일반 Page - Master Page 지정 안되어있는 경우 - Pass
+    - Description: Master Page 미지정 일반 Page의 저장 흐름을 확인한다.
+
+### QATC-4033 New Page
+- Status: Pass
+- Jira Description: 없음
+- Description:
+  - 신규 생성 팝업과 신규 페이지/그룹/마스터/모바일 마스터 생성 흐름을 점검하는 묶음이다.
+- Preconditions:
+  - 에디터에 정상 로그인되어 있어야 한다.
+  - 페이지 트리 영역이 정상 노출되어야 한다.
+  - 생성 가능한 권한이 있어야 한다.
+- Expected Results:
+  - 신규 생성 팝업이 정상 열려야 한다.
+  - 신규 페이지, 신규 그룹, 신규 마스터, 모바일 마스터가 각각 생성되어야 한다.
+  - 생성 후 페이지 트리 또는 대상 목록에 즉시 반영되어야 한다.
+- Subtasks:
+  - `QATC-4035` 신규 생성 팝업 - Pass
+    - Description: 새 페이지 생성 팝업이 정상 노출되는지 확인한다.
+  - `QATC-4040` 신규 생성 - 신규 페이지 - Pass
+    - Description: 신규 페이지 생성이 정상 동작하는지 확인한다.
+  - `QATC-4044` 신규 생성 - 신규 그룹 - Pass
+    - Description: 신규 그룹 생성이 정상 동작하는지 확인한다.
+  - `QATC-4048` 신규 생성 - 신규 마스터 - Pass
+    - Description: 신규 마스터 생성이 정상 동작하는지 확인한다.
+  - `QATC-4052` 모바일 마스터 - Pass
+    - Description: 모바일 마스터 생성이 정상 동작하는지 확인한다.
+
+### QATC-4057 Save
+- Status: Pass
+- Jira Description: 없음
+- Description:
+  - 페이지 저장과 다른 이름으로 저장 흐름을 점검하는 묶음이다.
+- Preconditions:
+  - 수정 가능한 페이지가 열려 있어야 한다.
+  - 저장 대상 변경 사항이 있어야 한다.
+- Expected Results:
+  - Save가 현재 페이지 기준으로 정상 동작해야 한다.
+  - Save as가 새 이름 또는 복제 저장 흐름으로 정상 동작해야 한다.
+  - 저장 후 경고 없이 완료 상태가 반영되어야 한다.
+- Subtasks:
+  - `QATC-4061` Save - Pass
+    - Description: 현재 페이지 저장이 정상 동작하는지 확인한다.
+  - `QATC-4065` Save as - Pass
+    - Description: 다른 이름으로 저장 기능이 정상 동작하는지 확인한다.
+
+### QATC-4068 Page
+- Status: Pass
+- Jira Description: 없음
+- Description:
+  - 페이지 트리에서 New, Rename, Delete, Update 등 기본 페이지 관리 동작을 점검하는 묶음이다.
+- Preconditions:
+  - 페이지 트리가 노출되어 있어야 한다.
+  - 수정 가능한 대상 페이지/그룹/마스터가 존재해야 한다.
+- Expected Results:
+  - Page/Group/Master 신규 생성이 정상 동작해야 한다.
+  - Rename 시 이름이 정상 변경되어야 한다.
+  - Delete 시 대상이 제거되고 목록이 갱신되어야 한다.
+  - Update 시 변경 사항이 반영되어야 한다.
+- Subtasks:
+  - `QATC-4072` New - Group, Page, Master - Pass
+    - Description: 그룹/페이지/마스터 신규 생성 메뉴가 정상 동작하는지 확인한다.
+  - `QATC-4076` Rename - Pass
+    - Description: 페이지 이름 변경이 정상 반영되는지 확인한다.
+  - `QATC-4081` Delete - Pass
+    - Description: 페이지 삭제가 정상 수행되는지 확인한다.
+  - `QATC-4084` Update - Pass
+    - Description: 페이지 업데이트 후 변경 사항이 반영되는지 확인한다.
+
+## Epic 6. QATC-755 [RENOBIT] Instance List
+
+### QATC-1522 구성
+- Status: 해야 할 일
+- Jira Description: 없음
+- Description:
+  - 에디터의 Instance List 영역 기본 구성과 검색, Visible, Look 동작을 점검하는 묶음이다.
+  - 에디터 영역과 인스턴스 리스트의 노출 관계를 확인하는 항목이 포함되어 있다.
+- Preconditions:
+  - RENOBIT 에디터가 정상적으로 열려 있어야 한다.
+  - 인스턴스가 포함된 페이지가 열려 있어야 한다.
+  - Instance List 패널과 검색창을 사용할 수 있어야 한다.
+- Expected Results:
+  - Instance List와 에디터 영역이 정상적으로 구분되어 보여야 한다.
+  - 검색어 입력 시 결과가 필터링되어야 한다.
+  - 검색어가 없거나 결과가 없을 때의 상태가 기대와 일치해야 한다.
+  - Visible, Look 관련 동작이 정상 반영되어야 한다.
+- Subtasks:
+  - `QATC-1523` 검색 > 검색어 O - 해야 할 일
+    - Description: 검색어가 존재할 때 Instance List가 정상 필터링되는지 확인한다.
+    - Preconditions: 인스턴스가 여러 개 포함된 페이지가 열려 있어야 한다.
+    - Expected Results: 검색 결과가 검색어와 일치하는 항목만 표시되어야 한다.
+  - `QATC-1524` 검색 > 검색어 X - 해야 할 일
+    - Description: 검색어와 일치하는 항목이 없을 때의 비정상/빈 결과 상태를 확인한다.
+    - Preconditions: 검색어와 일치하지 않는 문자열을 입력할 수 있어야 한다.
+    - Expected Results: 결과가 없다는 상태나 빈 리스트가 정상 표시되어야 한다.
+  - `QATC-1525` 인스턴스 리스트 > 에디터 영역 - 해야 할 일
+    - Description: Instance List에서 선택한 항목이 에디터 영역과 연동되는지 확인한다.
+    - Preconditions: 인스턴스가 있는 에디터 화면이 열려 있어야 한다.
+    - Expected Results: 선택한 인스턴스의 정보가 에디터 영역에 반영되어야 한다.
+  - `QATC-1526` 에디터 영역 > 인스턴스 리스트 - 해야 할 일
+    - Description: 에디터 영역에서의 선택 상태가 Instance List에 반영되는지 확인한다.
+    - Preconditions: 에디터에서 특정 인스턴스가 선택 가능한 상태여야 한다.
+    - Expected Results: 선택 상태가 리스트에서 하이라이트 또는 포커스로 표시되어야 한다.
+  - `QATC-1527` Visible - 해야 할 일
+    - Description: 선택한 인스턴스의 표시/숨김 상태를 전환할 수 있는지 확인한다.
+    - Preconditions: 숨김 처리 가능한 인스턴스가 선택되어 있어야 한다.
+    - Expected Results: Visible 상태가 전환되고 화면 또는 리스트 상태에 반영되어야 한다.
+  - `QATC-1528` Look - 해야 할 일
+    - Description: 인스턴스의 Look/포커스/강조 동작을 확인한다.
+    - Preconditions: 인스턴스가 선택되어 있어야 한다.
+    - Expected Results: 해당 인스턴스가 강조되거나 포커스된 상태로 표시되어야 한다.
+
+## Epic 7. QATC-758 [RENOBIT] GUI Option(2D/3D)
+
+### QATC-1214 GUI Option 3D
+- Status: 해야 할 일
+- Jira Description: 없음
+- Description:
+  - 3D GUI 옵션과 camera, controls, shadowMap, object3d, geometry, material, DCIM 3D components, directional light 표시를 점검하는 묶음이다.
+  - 2D/3D GUI Option 패널의 세부 옵션 노출과 값을 확인하는 항목이 포함되어 있다.
+- Preconditions:
+  - 3D 편집 화면 또는 3D 옵션 패널을 열 수 있는 페이지가 준비되어 있어야 한다.
+  - 3D 컴포넌트와 관련된 테스트 대상이 존재해야 한다.
+  - GUI Option 패널 조작이 가능한 권한이어야 한다.
+- Expected Results:
+  - GUI Option 3D 목록이 정상 노출되어야 한다.
+  - Controls, shadowMap, camera, object3d 관련 옵션이 정상 표시되어야 한다.
+  - 값 변경 또는 노출 토글이 기대대로 반영되어야 한다.
+  - 3D geometry/material 계층과 DCIM 3D Components가 정상 확인되어야 한다.
+- Subtasks:
+  - `QATC-1215` 목록 - 해야 할 일
+    - Description: 3D GUI Option의 최상위 목록이 정상 노출되는지 확인한다.
+    - Preconditions: GUI Option 3D 패널이 열려 있어야 한다.
+    - Expected Results: 옵션 카테고리 목록이 누락 없이 보여야 한다.
+  - `QATC-1223` Controls - 해야 할 일
+    - Description: 3D 컨트롤 관련 옵션 그룹이 표시되는지 확인한다.
+    - Preconditions: 3D 옵션 패널이 활성화되어 있어야 한다.
+    - Expected Results: Controls 항목이 펼쳐지고 관련 옵션이 보여야 한다.
+  - `QATC-1226` shadowMap > enable - 해야 할 일
+    - Description: shadowMap 사용 여부를 토글할 수 있는지 확인한다.
+    - Preconditions: 3D 렌더링 옵션이 노출되어야 한다.
+    - Expected Results: enable 값 변경이 정상 반영되어야 한다.
+  - `QATC-1230` shadowMap > type > BasicShadowMap - 해야 할 일
+    - Description: shadowMap 타입을 BasicShadowMap으로 지정할 수 있는지 확인한다.
+    - Preconditions: shadowMap type 선택 UI가 보여야 한다.
+    - Expected Results: BasicShadowMap이 선택 상태로 반영되어야 한다.
+  - `QATC-1231` shadowMap > type > PCFShadowMap - 해야 할 일
+    - Description: shadowMap 타입을 PCFShadowMap으로 지정할 수 있는지 확인한다.
+    - Preconditions: shadowMap type 선택 UI가 보여야 한다.
+    - Expected Results: PCFShadowMap이 선택 상태로 반영되어야 한다.
+  - `QATC-1233` shadowMap > type > PCFSoftShadowMap - 해야 할 일
+    - Description: shadowMap 타입을 PCFSoftShadowMap으로 지정할 수 있는지 확인한다.
+    - Preconditions: shadowMap type 선택 UI가 보여야 한다.
+    - Expected Results: PCFSoftShadowMap이 선택 상태로 반영되어야 한다.
+  - `QATC-1235` shadowMap > type > VSMShadowMap - 해야 할 일
+    - Description: shadowMap 타입을 VSMShadowMap으로 지정할 수 있는지 확인한다.
+    - Preconditions: shadowMap type 선택 UI가 보여야 한다.
+    - Expected Results: VSMShadowMap이 선택 상태로 반영되어야 한다.
+  - `QATC-1239` camera > fov - 해야 할 일
+    - Description: 카메라 FOV 값을 조정할 수 있는지 확인한다.
+    - Preconditions: camera 설정 UI가 보여야 한다.
+    - Expected Results: fov 입력값이 화면에 반영되어야 한다.
+  - `QATC-1241` camera > near - 해야 할 일
+    - Description: 카메라 near 값을 조정할 수 있는지 확인한다.
+    - Preconditions: camera 설정 UI가 보여야 한다.
+    - Expected Results: near 입력값이 화면에 반영되어야 한다.
+  - `QATC-1242` camera > far - 해야 할 일
+    - Description: 카메라 far 값을 조정할 수 있는지 확인한다.
+    - Preconditions: camera 설정 UI가 보여야 한다.
+    - Expected Results: far 입력값이 화면에 반영되어야 한다.
+  - `QATC-1244` control > autoRotate - 해야 할 일
+    - Description: 3D 컨트롤의 자동 회전 옵션을 토글할 수 있는지 확인한다.
+    - Preconditions: control 설정 UI가 보여야 한다.
+    - Expected Results: autoRotate 상태가 정상 전환되어야 한다.
+  - `QATC-1345` 3d_형태_no > 3D Geometry > object3d - 해야 할 일
+    - Description: 3D Geometry의 object3d 항목이 정상 표시되는지 확인한다.
+    - Preconditions: 3D Geometry 계층이 로드되어야 한다.
+    - Expected Results: object3d 항목이 보이고 선택 가능해야 한다.
+  - `QATC-1349` 3d_형태_no > 3D Geometry > position - 해야 할 일
+    - Description: 3D Geometry의 position 옵션을 확인한다.
+    - Preconditions: 3D Geometry 계층이 로드되어야 한다.
+    - Expected Results: position 항목이 보이고 값 변경이 가능해야 한다.
+  - `QATC-1351` 3d_형태_no > 3D Geometry > rotation - 해야 할 일
+    - Description: 3D Geometry의 rotation 옵션을 확인한다.
+    - Preconditions: 3D Geometry 계층이 로드되어야 한다.
+    - Expected Results: rotation 항목이 보이고 값 변경이 가능해야 한다.
+  - `QATC-1353` 3d_형태_no > 3D Geometry > scale - 해야 할 일
+    - Description: 3D Geometry의 scale 옵션을 확인한다.
+    - Preconditions: 3D Geometry 계층이 로드되어야 한다.
+    - Expected Results: scale 항목이 보이고 값 변경이 가능해야 한다.
+  - `QATC-1355` 3d_형태_no > 3D Geometry > material - 해야 할 일
+    - Description: 3D Geometry의 material 옵션을 확인한다.
+    - Preconditions: 3D Geometry 계층이 로드되어야 한다.
+    - Expected Results: material 항목이 보이고 속성 변경이 가능해야 한다.
+  - `QATC-1357` 3d_형태_no > 3D Geometry > geometry - 해야 할 일
+    - Description: 3D Geometry의 geometry 옵션을 확인한다.
+    - Preconditions: 3D Geometry 계층이 로드되어야 한다.
+    - Expected Results: geometry 항목이 보이고 속성 변경이 가능해야 한다.
+  - `QATC-1365` dcim_pack > DCIM 3D Components - 해야 할 일
+    - Description: DCIM 3D Components가 목록에 포함되는지 확인한다.
+    - Preconditions: dcim_pack 자원이 로드되어야 한다.
+    - Expected Results: DCIM 3D Components가 정상 노출되어야 한다.
+  - `QATC-1557` directionalLightPosition > visible - 해야 할 일
+    - Description: directionalLightPosition의 visible 상태를 토글할 수 있는지 확인한다.
+    - Preconditions: directional light 관련 옵션이 보여야 한다.
+    - Expected Results: visible 값이 정상 반영되어야 한다.
+
+## Notes
+- 위 목록은 Jira `QA_TESTCASE` 에픽/하위 태스크/서브태스크 구조를 그대로 정리한 것이다.
+- `Description`, `Preconditions`, `Expected Results`는 Jira 원문이 비어 있는 부분을 보강해 정리한 내용이다.
+- Jira 하위 태스크 `description` 원문은 대부분 비어 있었다.
+- 확인된 실패 항목은 현재 기준으로 `QATC-3975` 1건이다.
+- `Manager 3.5.0`에는 `Dataset/Resource` 외에도 `Template Manager`, `Language Manager`가 포함된다.
+- `QATC-755`는 `Instance List` 관련 Epic이고, `QATC-758`는 2D/3D GUI Option 관련 Epic이다.

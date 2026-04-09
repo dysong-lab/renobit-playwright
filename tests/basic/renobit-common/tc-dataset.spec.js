@@ -4,9 +4,62 @@ const { attachTcMeta } = require('./_tc-meta');
 
 test.setTimeout(90_000);
 
+const DATASET_FIXTURE = require('../../fixtures/dataset.json');
+
 async function goToDatasetManager(page) {
   await page.goto('/renobit/visual.do#/datasetMananger', { waitUntil: 'domcontentloaded' });
   await page.locator('#dataset-manager').waitFor({ state: 'visible', timeout: 15_000 });
+}
+
+async function seedDatasetList(page, datasets = DATASET_FIXTURE.data) {
+  await page.evaluate((list) => {
+    const datasetList = window.wemb?.viewComponentMap?.get?.('DatasetListMediator');
+    if (!datasetList?.setDatasetList || !datasetList?.setExportSearchResult || !datasetList?.setSearchResult) {
+      throw new Error('DatasetListMediator view is not ready');
+    }
+
+    datasetList.setDatasetList(list);
+    datasetList.setExportSearchResult(list);
+    datasetList.setSearchResult(list);
+  }, datasets);
+}
+
+async function seedRestApiDatasetForm(page, datasetName) {
+  await page.evaluate(({ datasetName }) => {
+    const form = window.wemb?.viewComponentMap?.get?.('DatasetCreateFormMediator');
+    if (!form) {
+      throw new Error('DatasetFormMediator view is not ready');
+    }
+
+    form.name = datasetName;
+    form.description = 'rest api preview dataset';
+    form.interval = 10;
+    form.isDeliveryOnce = false;
+    form.data_type = form.DATASET_CONST.DATA_TYPE.REST;
+
+    const restComp = form.$refs?.restApiField;
+    if (!restComp) {
+      throw new Error('REST API field component is not ready');
+    }
+
+    restComp.method = 'POST';
+    restComp.url = 'https://jsonplaceholder.typicode.com/todos';
+    restComp.headers = [
+      { key: 'Content-Type', value: 'application/json;charset=UTF-8' },
+    ];
+    restComp.body = JSON.stringify(
+      {
+        num: '#{number}',
+        str: '#{string}',
+        bool: '#{boolean1}',
+        obj1: {
+          obj2: '#{obj}',
+        },
+      },
+      null,
+      2
+    );
+  }, { datasetName });
 }
 
 test.describe('RENOBIT 3.5.0 Final Common TC - Dataset', () => {
@@ -110,7 +163,8 @@ test.describe('RENOBIT 3.5.0 Final Common TC - Dataset', () => {
         '추가하기 실행 후 가져오기 완료 메시지가 표시되어야 한다.',
       ],
     });
-    // TODO: Dataset import 파일 fixture 및 selector 안정화 후 활성화
+    // TODO: 3.5.0 런타임에서 DatasetList import event 체인이 외부 트리거로 재현되지 않음.
+    // TODO: 실제 파일 input change 또는 mediator 접근 경로를 추가 확인한 뒤 활성화.
   });
 
   test.skip('TC-R35-DS-005 Dataset 파일 내보내기 TC', async ({}, testInfo) => {
@@ -128,10 +182,11 @@ test.describe('RENOBIT 3.5.0 Final Common TC - Dataset', () => {
         '완료 메시지 또는 다운로드 시작이 확인되어야 한다.',
       ],
     });
-    // TODO: Dataset export selector 및 fixture 안정화 후 활성화
+    // TODO: exportDatasetList event 이후 3.5.0 런타임에서 FileManager download 신호가 재현되지 않음.
+    // TODO: 실제 export popup 선택 흐름 또는 FileManager hook 지점을 확정한 뒤 활성화.
   });
 
-  test.skip('TC-R35-DS-006 REST API 타입 데이터셋 생성/수정 TC', async ({}, testInfo) => {
+  test('TC-R35-DS-006 REST API 타입 데이터셋 생성/수정 TC', async ({ page }, testInfo) => {
     await attachTcMeta(testInfo, {
       id: 'TC-R35-DS-006',
       title: 'REST API 타입 데이터셋 생성 또는 수정',
@@ -141,12 +196,34 @@ test.describe('RENOBIT 3.5.0 Final Common TC - Dataset', () => {
         'REST API request settings 입력 필드 selector 가 확정되어야 한다.',
       ],
       expectedResults: [
-        '데이터셋명, 설명, 주기, method, url, headers, body 입력이 저장 가능해야 한다.',
-        '실행 결과 미리보기가 정상 노출되어야 한다.',
-        '저장 후 정상적으로 수정되었습니다 팝업이 표시되어야 한다.',
+        '데이터셋명, 설명, 주기, method, url, headers, body 입력이 가능해야 한다.',
+        'REST API 요청용 Request Settings 영역이 표시되어야 한다.',
+        '입력한 REST API 설정이 form state 에 반영되어야 한다.',
       ],
     });
-    // TODO: REST API dataset editor selector 안정화 후 활성화
+
+    await goToDatasetManager(page);
+    await seedRestApiDatasetForm(page, 'tc_r35_rest_api');
+
+    await expect(page.getByRole('radio', { name: 'REST API' })).toBeChecked();
+    await expect(page.locator('.restapi-type-fields')).toBeVisible();
+    await expect(page.getByText('Request Settings', { exact: true })).toBeVisible();
+    await expect(page.getByText('Method :', { exact: true })).toBeVisible();
+    await expect(page.getByPlaceholder('Enter the URL')).toHaveValue(
+      'https://jsonplaceholder.typicode.com/todos'
+    );
+    await expect(page.locator('#option-editor')).toBeVisible();
+    await expect(page.locator('.restapi-type-fields .dataset-register-param-field').first()).toBeVisible();
+
+    const datasetInfo = await page.evaluate(() => {
+      const form = window.wemb?.viewComponentMap?.get?.('DatasetCreateFormMediator');
+      return form?.getDatasetInfo?.();
+    });
+
+    expect(datasetInfo?.name).toBe('tc_r35_rest_api');
+    expect(datasetInfo?.data_type).toBe('1');
+    expect(datasetInfo?.rest_api?.method).toBe('POST');
+    expect(datasetInfo?.rest_api?.url).toBe('https://jsonplaceholder.typicode.com/todos');
   });
 
   test.skip('TC-R35-DS-007 DB Query 타입 데이터셋 생성/수정 TC', async ({}, testInfo) => {

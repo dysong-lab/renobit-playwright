@@ -79,12 +79,12 @@ Expected Results
 - View 영역의 기본 버튼이 표시되어야 한다.
 - 보기 관련 버튼이 공통 header 또는 toolbar 에서 식별 가능해야 한다.
 
-### TC-R35-COM-008 Common Toolbar - Mobile Master 영역 기본 버튼 표시
+<!-- ### TC-R35-COM-008 Common Toolbar - Mobile Master 영역 기본 버튼 표시
 Preconditions
 - 에디터 로그인 완료 상태여야 한다.
 
 Expected Results
-- Mobile Master 관련 버튼 또는 토글 영역이 표시되어야 한다.
+- Mobile Master 관련 버튼 또는 토글 영역이 표시되어야 한다. -->
 
 ### TC-R35-COM-009 Common Header - Zoom 토글 표시
 Preconditions
@@ -94,13 +94,13 @@ Expected Results
 - Zoom 표시 또는 zoom control UI 가 보여야 한다.
 - 사용자가 현재 편집 배율을 확인할 수 있어야 한다.
 
-### TC-R35-COM-010 Common Header - Device/View 선택 combobox 표시
+<!-- ### TC-R35-COM-010 Common Header - Device/View 선택 combobox 표시
 Preconditions
 - 에디터 로그인 완료 상태여야 한다.
 
 Expected Results
 - Device 또는 View 선택용 combobox 가 표시되어야 한다.
-- 선택 UI 는 비정상 스크립트 에러 없이 열릴 수 있어야 한다.
+- 선택 UI 는 비정상 스크립트 에러 없이 열릴 수 있어야 한다. -->
 
 ### TC-R35-COM-011 Empty State - 활성 페이지 미존재 메시지 표시
 Preconditions
@@ -332,7 +332,7 @@ Expected Results
 상태
 - 현재 자동화는 `pending`
 
-## Component Manager
+<!-- ## Component Manager
 
 ### TC-R35-CM-001 AmCharts Area 배치
 ### TC-R35-CM-002 AmCharts Column Line 배치
@@ -393,7 +393,7 @@ Expected Results
 - 수정 후 저장 가능한 상태를 유지해야 한다.
 
 상태
-- 현재 자동화는 `pending`
+- 현재 자동화는 `pending` -->
 
 ## CodeBox
 

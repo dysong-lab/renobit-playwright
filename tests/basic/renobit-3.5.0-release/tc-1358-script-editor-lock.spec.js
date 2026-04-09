@@ -4,7 +4,7 @@ const {
   goToEditor,
   addThreeBox,
   switchToThreeLayer,
-} = require('./helpers/renobit');
+} = require('../../helpers/renobit');
 
 test.setTimeout(60_000);
 

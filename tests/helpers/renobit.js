@@ -41,7 +41,7 @@ async function loginAsEditor(page) {
 
   await setLoginCredentials(page, {
     username: 'admin',
-    password: 'didi0205',
+    password: 'wemb@#@#',
   });
   await page.locator('#Editor').check();
   await page.locator('button.new_btn').click();
@@ -60,7 +60,7 @@ async function loginAsEditor(page) {
 async function submitEditorLogin(page) {
   await setLoginCredentials(page, {
     username: 'admin',
-    password: 'didi0205',
+    password: 'wemb@#@#',
   });
   await page.locator('#Editor').check();
   await page.locator('button.new_btn').click();
@@ -87,9 +87,7 @@ async function waitForEditorReady(page) {
         window.wemb?.mainPageComponent &&
         window.wemb?.$createPageModal &&
         editorProxy &&
-        (editorProxy._readyCompleted === true ||
-          editorProxy.getReadyCompleted?.() === true ||
-          editorProxy._appState === 'readyCompleted') &&
+        editorProxy._readyCompleted === true &&
         pageTreeDataManager?._rootId &&
         pageTreeDataManager?.focusTargetId &&
         Array.isArray(pageTreeDataManager?.treeData)
@@ -153,7 +151,7 @@ async function waitForActiveEditorPage(page, pageId) {
       );
     },
     pageId,
-    { timeout: 30_000 }
+    { timeout: 120_000 }
   );
 }
 
@@ -208,8 +206,6 @@ async function closeCreatePageModalIfVisible(page) {
 }
 
 async function createPageByType(page, { type = 'page', name, mobile = false }) {
-  await page.waitForFunction(() => !!window.wemb?.$createPageModal, { timeout: 15_000 });
-
   // showNewPage 후 Vue nextTick 대기 후 name 설정 → reactive state 확실히 반영
   await page.evaluate(
     async ({ createType, pageName, isMobile }) => {

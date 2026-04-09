@@ -1,6 +1,6 @@
 const { defineConfig } = require('@playwright/test');
 
-const baseURL = process.env.PLAYWRIGHT_BASE_URL || 'http://localhost:6284';
+const baseURL = process.env.PLAYWRIGHT_BASE_URL || 'http://10.23.128.203:9000';
 
 module.exports = defineConfig({
   testDir: './tests',
@@ -9,6 +9,7 @@ module.exports = defineConfig({
     timeout: 5_000,
   },
   fullyParallel: false,
+  workers: 1,
   retries: 0,
   globalSetup: './global-setup.js',
   reporter: [['list'], ['html', { open: 'never' }]],

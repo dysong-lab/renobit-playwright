@@ -194,7 +194,7 @@ test.describe('RENOBIT 3.5.0 Final Common TC - Page', () => {
 
     const modal = page.locator('#exportPagesModal');
     await expect(modal).toBeVisible();
-    await modal.locator('.search-field').fill(pageName);
+    await modal.getByPlaceholder('페이지명을 입력하세요.').fill(pageName);
 
     const searchList = modal.locator('.page-search-list');
     const checkbox = searchList.locator(`input.el-checkbox__original[value="${pageName}"]`).first();

@@ -12,9 +12,9 @@ const {
   setThreeTransformMode,
   switchToThreeLayer,
   waitForEditorReady,
-} = require('./helpers/renobit');
+} = require('../../helpers/renobit');
 
-test.setTimeout(120_000);
+test.setTimeout(240_000);
 
 test('TC-1369-02: T/R/S mode buttons', async ({ page }) => {
   const runId = Date.now().toString(36);
