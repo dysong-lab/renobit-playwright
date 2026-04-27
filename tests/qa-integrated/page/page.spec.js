@@ -423,7 +423,7 @@ test.describe('PAGE Module Tests', () => {
       .locator('xpath=.//*[normalize-space(text())="Master Page"]/../..//input[not(@type="checkbox")]')
       .first();
     await expect(masterInput).toBeVisible({ timeout: 10000 });
-    await expect(masterInput).toHaveValue('');
+    await expect(masterInput).toHaveValue('No Master Page');
   });
 
   test('[QATC-3226] Page - Save - Save { @QA @Page @QATC-3226 }', async ({ page }) => {
