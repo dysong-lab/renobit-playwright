@@ -413,6 +413,20 @@ test.describe('PAGE Module Tests', () => {
      * [Expected Result]: No Master Page 노출
      * [Automation Note]: UI 조작 + page.evaluate()로 자동화 가능
      */
+    // 이전 테스트에서 마스터가 지정됐을 수 있으므로 클리어 후 저장
+    await page.evaluate(() => {
+      const info = window.wemb?.pageManager?.currentPageInfo;
+      if (info?.master) {
+        info.master = '';
+        info.masterType = '';
+        window.wemb.editorFacade.sendNotification('command/savePage');
+      }
+    });
+    await page.locator('.el-message--success').first()
+      .waitFor({ state: 'attached', timeout: 8000 }).catch(() => {});
+    // 서버에서 최신 상태 반영
+    await ensureTestPage(page, 'qa-page-test-page');
+
     // 마스터 페이지가 지정되지 않은 일반 페이지의 기본 상태 확인
     await openPropertiesPanel(page);
     const masterInput = page.locator('#component-property-panel')
