@@ -22,7 +22,7 @@ test.describe('PAGE Module Tests', () => {
   test('[QATC-3215] Page - New Page - 신규 생성 팝업 { @QA @Page @QATC-3215 }', async ({ page }) => {
     // UI를 통해 신규 생성 팝업 호출
     await openNewPageModal(page);
-    const modal = page.locator('#createPageModal, .v--modal-box').first();
+    const modal = page.locator('[data-modal="createPageModal"] .v--modal-box, #createPageModal').first();
     await expect(modal).toBeVisible();
     
     // 팝업 내부 요소 렌더링 확인 (간단히 닫기 버튼으로 검증)

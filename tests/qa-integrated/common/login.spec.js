@@ -58,7 +58,7 @@ test.describe('LOGIN Module Tests', () => {
     await page.goto('/renobit/login.do');
     
     // ID/PW는 로컬/QA용 임시 계정으로 대체 필요
-    await submitLogin(page, { username: 'admin', password: 'wemb@#@#', editor: false });
+    await submitLogin(page, { username: 'admin', password: 'didi0205!!', editor: false });
     expect(page.url()).toContain('/renobit/visualViewer.do');
   });
 

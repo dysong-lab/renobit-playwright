@@ -55,7 +55,7 @@ async function submitLogin(
   page,
   {
     username = 'admin',
-    password = 'wemb@#@#',
+    password = 'didi0205!!',
     editor = true,
     successPattern,
   } = {}
@@ -129,11 +129,17 @@ async function ensureEditorSession(page) {
 
   await waitForEditorReady(page);
 
-  // 빈 상태(no active page)이면 treeData의 첫 번째 page를 열어 _masterLayer를 초기화한다.
-  // _masterLayer는 페이지 열릴 때 생성되며, createPageByType이 이를 필요로 하기 때문이다.
+  // 에디터가 초기 페이지를 자동 로딩 중일 수 있으므로 완전히 끝날 때까지 넉넉히 60초 대기합니다.
+  // (에셋이 거대한 프로젝트의 경우 15초 이상 걸릴 수 있습니다.)
+  await page.waitForFunction(
+    () => window.wemb?.mainPageComponent?.isLoaded === true || window.wemb?.pageTreeDataManager?.treeData?.length === 0,
+    { timeout: 60_000 }
+  );
+
   const hasActivePage = await page.evaluate(
     () => !!window.wemb?.pageManager?.currentPageInfo?.id
   );
+
   if (!hasActivePage) {
     const firstPageId = await page.evaluate(() => {
       const treeData = window.wemb?.pageTreeDataManager?.treeData || [];
@@ -158,8 +164,6 @@ async function goToEditor(page) {
 }
 
 async function waitForActiveEditorPage(page, pageId) {
-  // _isOpenPage는 소스에서 주석처리되어 사용 불가. isLoaded === true가 실제 완료 신호.
-  // master 페이지는 3D가 비활성화되어 threeLayer가 초기화되지 않으므로 타입에 따라 조건 분기.
   await page.waitForFunction(
     (id) => {
       const currentId = window.wemb?.pageManager?.currentPageInfo?.id;
@@ -168,6 +172,14 @@ async function waitForActiveEditorPage(page, pageId) {
 
       if (currentId !== id || !isLoaded) return false;
       if (pageType === 'master') return true;
+      
+      let configObj = window.wemb?.pageManager?.currentPageInfo?.config;
+      if (typeof configObj === 'string') {
+         try { configObj = JSON.parse(configObj); } catch(e) {}
+      }
+      const is3D = configObj?.three === true || configObj?.three === "true";
+      if (!is3D) return true;
+      
       return !!window.wemb?.mainPageComponent?.threeLayer;
     },
     pageId,
@@ -268,12 +280,24 @@ async function selectContextMenu(page, labelRegex) {
  * (소스: ShowNewPageModalCommand.ts → $createPageModal.showNewPage(createType))
  */
 async function openNewPageModal(page) {
-  await page.evaluate(() => {
-    window.wemb.$createPageModal.showNewPage('page');
-  });
+  const modal = page.locator('[data-modal="createPageModal"] .v--modal-box, #createPageModal').first();
 
-  const modal = page.locator('#createPageModal, .v--modal-box').first();
-  await modal.waitFor({ state: 'visible', timeout: 10000 });
+  for (let i = 0; i < 3; i++) {
+    await page.waitForTimeout(500);
+    await page.evaluate(() => {
+      window.wemb.$createPageModal?.showNewPage?.('page');
+    });
+
+    try {
+      await modal.waitFor({ state: 'visible', timeout: 3000 });
+      return;
+    } catch (e) {
+      // 렌더링 애니메이션이나 Vue 상태 충돌로 모달이 열리지 않았을 수 있으므로 재시도
+      console.log('Retrying openNewPageModal...');
+    }
+  }
+
+  await modal.waitFor({ state: 'visible', timeout: 5000 });
 }
 
 async function createPageByType(page, { type = 'page', name, mobile = false }) {
@@ -283,7 +307,7 @@ async function createPageByType(page, { type = 'page', name, mobile = false }) {
     window.wemb.$createPageModal.showNewPage(createType);
   }, type);
 
-  const modal = page.locator('#createPageModal, .v--modal-box').first();
+  const modal = page.locator('[data-modal="createPageModal"] .v--modal-box, #createPageModal').first();
   await modal.waitFor({ state: 'visible', timeout: 15000 });
 
   // 2. Mobile Master 체크 (master 타입일 때만)
