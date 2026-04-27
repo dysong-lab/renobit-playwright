@@ -36,42 +36,60 @@ async function setLoginCredentials(page, { username, password }) {
   );
 }
 
-async function loginAsEditor(page) {
-  await page.goto('/renobit/login.do', { waitUntil: 'domcontentloaded' });
+async function setEditorMode(page, enabled) {
+  const editorCheckbox = page.locator('#Editor');
+  await editorCheckbox.waitFor({ state: 'attached' });
 
-  await setLoginCredentials(page, {
-    username: 'admin',
-    password: 'wemb@#@#',
-  });
-  await page.locator('#Editor').check();
+  const isChecked = await editorCheckbox.isChecked().catch(() => false);
+  if (enabled && !isChecked) {
+    await editorCheckbox.check();
+    return;
+  }
+
+  if (!enabled && isChecked) {
+    await editorCheckbox.uncheck();
+  }
+}
+
+async function submitLogin(
+  page,
+  {
+    username = 'admin',
+    password = 'wemb@#@#',
+    editor = true,
+    successPattern,
+  } = {}
+) {
+  await setLoginCredentials(page, { username, password });
+  await setEditorMode(page, editor);
   await page.locator('button.new_btn').click();
 
-  await page.waitForURL(/\/renobit\/visual\.do#\//, { timeout: 20_000 });
+  const expectedPattern = successPattern || (editor ? /\/renobit\/visual\.do#\// : /\/renobit\/visualViewer\.do#\//);
+  await page.waitForURL(expectedPattern, { timeout: 20_000 });
 
-  // isLoaded가 true가 되면 OpenPageCommand의 _completedLoadAllResource까지 완료된 것
-  await page.waitForFunction(
-    () =>
-      !!window.wemb?.mainPageComponent?.threeLayer &&
-      window.wemb?.mainPageComponent?.isLoaded === true,
-    { timeout: 60_000 }
-  );
+  if (editor) {
+    // new_btn은 새 페이지를 생성하므로 threeLayer + isLoaded까지 대기한다.
+    await page.waitForFunction(
+      () =>
+        !!window.wemb?.mainPageComponent?.threeLayer &&
+        window.wemb?.mainPageComponent?.isLoaded === true,
+      { timeout: 60_000 }
+    );
+  }
+}
+
+async function loginAsEditor(page) {
+  await page.goto('/renobit/login.do', { waitUntil: 'domcontentloaded' });
+  await submitLogin(page, { editor: true });
 }
 
 async function submitEditorLogin(page) {
-  await setLoginCredentials(page, {
-    username: 'admin',
-    password: 'wemb@#@#',
-  });
-  await page.locator('#Editor').check();
-  await page.locator('button.new_btn').click();
-  await page.waitForURL(/\/renobit\/visual\.do#\//, { timeout: 20_000 });
-  // new_btn은 새 페이지를 생성하므로 threeLayer + isLoaded까지 대기한다.
-  await page.waitForFunction(
-    () =>
-      !!window.wemb?.mainPageComponent?.threeLayer &&
-      window.wemb?.mainPageComponent?.isLoaded === true,
-    { timeout: 60_000 }
-  );
+  await submitLogin(page, { editor: true });
+}
+
+async function loginAsViewer(page) {
+  await page.goto('/renobit/login.do', { waitUntil: 'domcontentloaded' });
+  await submitLogin(page, { editor: false });
 }
 
 async function waitForEditorReady(page) {
@@ -109,7 +127,6 @@ async function ensureEditorSession(page) {
     return;
   }
 
-  await page.waitForURL(/\/renobit\/visual\.do#\//, { timeout: 20_000 });
   await waitForEditorReady(page);
 
   // 빈 상태(no active page)이면 treeData의 첫 번째 page를 열어 _masterLayer를 초기화한다.
@@ -142,13 +159,16 @@ async function goToEditor(page) {
 
 async function waitForActiveEditorPage(page, pageId) {
   // _isOpenPage는 소스에서 주석처리되어 사용 불가. isLoaded === true가 실제 완료 신호.
+  // master 페이지는 3D가 비활성화되어 threeLayer가 초기화되지 않으므로 타입에 따라 조건 분기.
   await page.waitForFunction(
     (id) => {
-      return (
-        window.wemb?.pageManager?.currentPageInfo?.id === id &&
-        !!window.wemb?.mainPageComponent?.threeLayer &&
-        window.wemb?.mainPageComponent?.isLoaded === true
-      );
+      const currentId = window.wemb?.pageManager?.currentPageInfo?.id;
+      const isLoaded = window.wemb?.mainPageComponent?.isLoaded === true;
+      const pageType = window.wemb?.pageManager?.currentPageInfo?.type;
+
+      if (currentId !== id || !isLoaded) return false;
+      if (pageType === 'master') return true;
+      return !!window.wemb?.mainPageComponent?.threeLayer;
     },
     pageId,
     { timeout: 120_000 }
@@ -186,8 +206,8 @@ async function ensureActivePage(page) {
 async function findPageIdByName(page, pageName) {
   return page.evaluate((name) => {
     const treeData = window.wemb?.pageTreeDataManager?.treeData || [];
-    // treeData 항목의 페이지명 필드는 'text' (name이 아님)
-    const found = treeData.find((item) => item.text === name && item.type === 'page');
+    // type 무관하게 이름으로 탐색 (page/master/group 모두 대응)
+    const found = treeData.find((item) => item.text === name);
     return found?.id || null;
   }, pageName);
 }
@@ -205,32 +225,109 @@ async function closeCreatePageModalIfVisible(page) {
   }
 }
 
+/**
+ * jstree의 특정 항목을 우클릭하여 컨텍스트 메뉴를 호출합니다.
+ */
+async function rightClickTreeItem(page, itemName) {
+  // collapse된 부모 노드 아래 anchor가 hidden 상태일 수 있으므로 모든 jstree 노드 펼치기
+  await page.evaluate(() => {
+    document.querySelectorAll('.jstree').forEach(tree => {
+      if (window.$ && $.fn.jstree) $(tree).jstree('open_all');
+    });
+  }).catch(() => {});
+
+  const anchor = page.locator('a.jstree-anchor').filter({ hasText: itemName }).first();
+  await anchor.waitFor({ state: 'visible', timeout: 10000 });
+  await anchor.scrollIntoViewIfNeeded();
+
+  // click({ button: 'right' }) 대신 dispatchEvent 사용하여 jstree 이벤트 확실히 트리거
+  await anchor.dispatchEvent('contextmenu');
+
+  // 메뉴가 뜰 때까지 대기
+  await page.waitForSelector('.vakata-context', { state: 'visible', timeout: 5000 });
+}
+
+/**
+ * 노출된 컨텍스트 메뉴에서 특정 텍스트를 가진 항목을 클릭합니다.
+ * page.evaluate 내 element.click()은 합성 이벤트라 pointer/mouse 이벤트가 발생하지 않아
+ * jstree 서브메뉴 hover 활성화가 안 됩니다. Playwright locator의 네이티브 클릭을 사용합니다.
+ */
+async function selectContextMenu(page, labelRegex) {
+  const item = page.locator('.vakata-context li > a')
+    .filter({ hasText: labelRegex })
+    .first();
+  await item.waitFor({ state: 'visible', timeout: 5000 });
+  // hover로 서브메뉴 펼침 (서브메뉴가 없는 항목에도 무해함)
+  await item.hover();
+  await item.click();
+}
+
+/**
+ * 신규 페이지 생성 모달을 엽니다.
+ * $createPageModal.showNewPage(type)이 실제 API입니다.
+ * (소스: ShowNewPageModalCommand.ts → $createPageModal.showNewPage(createType))
+ */
+async function openNewPageModal(page) {
+  await page.evaluate(() => {
+    window.wemb.$createPageModal.showNewPage('page');
+  });
+
+  const modal = page.locator('#createPageModal, .v--modal-box').first();
+  await modal.waitFor({ state: 'visible', timeout: 10000 });
+}
+
 async function createPageByType(page, { type = 'page', name, mobile = false }) {
-  // showNewPage 후 Vue nextTick 대기 후 name 설정 → reactive state 확실히 반영
-  await page.evaluate(
-    async ({ createType, pageName, isMobile }) => {
-      const modal = window.wemb?.$createPageModal;
-      if (!modal) {
-        throw new Error('CreatePageModal is not ready');
-      }
+  // 1. showNewPage(type)으로 모달 오픈과 타입 선택을 동시에 처리
+  // (소스: ShowNewPageModalCommand.ts → $createPageModal.showNewPage(createType))
+  await page.evaluate((createType) => {
+    window.wemb.$createPageModal.showNewPage(createType);
+  }, type);
 
-      modal.showNewPage(createType);
-      await new Promise((resolve) => modal.$nextTick(resolve));
+  const modal = page.locator('#createPageModal, .v--modal-box').first();
+  await modal.waitFor({ state: 'visible', timeout: 15000 });
 
-      if (createType === 'group') {
-        modal.pageGroupName = pageName;
-        await modal._createPageGroup();
-        return;
-      }
+  // 2. Mobile Master 체크 (master 타입일 때만)
+  if (type === 'master' && mobile) {
+    const mobileCheckbox = modal.locator('label.el-checkbox').filter({ hasText: /Mobile\s*Master/i }).first();
+    const isChecked = await mobileCheckbox.locator('input').isChecked();
+    if (!isChecked) {
+      await mobileCheckbox.click();
+    }
+    await page.waitForTimeout(200);
+  }
 
-      modal.pageInfoProperties.name = pageName;
-      if (createType === 'master') {
-        modal.isMobile = isMobile;
-      }
-      await modal._createPage();
-    },
-    { createType: type, pageName: name, isMobile: mobile }
-  );
+  // 3. 이름 입력
+  // page/master: #pageName, group: #pageName2 (CreatePageModal.vue v-if/v-else 분기)
+  const nameInput = modal.locator('#pageName, #pageName2').first();
+  await nameInput.waitFor({ state: 'visible' });
+  await nameInput.fill(name);
+
+  // 4. 생성 버튼 클릭
+  const createBtn = modal.locator('button').filter({ hasText: /생성|Create|OK/i }).last();
+  await createBtn.click();
+
+  // 5. 모달 닫힘 대기
+  await modal.waitFor({ state: 'hidden', timeout: 10000 }).catch(() => {});
+
+  // 6. 새 페이지 로딩 완료 대기
+  // isLoaded === true는 이전 페이지 상태와 구분이 안 되므로, 새 페이지 ID 기반으로 대기.
+  // treeData에 새 페이지가 등록된 후 waitForActiveEditorPage로 로딩 완료를 확인한다.
+  await page.waitForFunction(
+    (pageName) => (window.wemb?.pageTreeDataManager?.treeData || [])
+      .some(item => item.text === pageName),
+    name,
+    { timeout: 15000 }
+  ).catch(() => {});
+
+  // const newPageId = await findPageIdByName(page, name);
+  // if (newPageId) {
+  //   await waitForActiveEditorPage(page, newPageId).catch(() => {});
+  // }
+
+    const newPageId = await findPageIdByName(page, name);
+  if (newPageId && type !== 'group') {
+    await waitForActiveEditorPage(page, newPageId).catch(() => {});
+  }
 }
 
 /**
@@ -327,11 +424,59 @@ async function switchToThreeLayer(page) {
   );
 }
 
-async function savePage(page) {
-  await page.evaluate(() => {
-    window.wemb.editorFacade.sendNotification('command/savePage');
-  });
-  await page.waitForTimeout(2_000);
+async function getActiveLayerName(page) {
+  return page.evaluate(() => window.wemb?.mainPageComponent?.activeLayer?.name || null);
+}
+
+async function getSelectedLanguage(page) {
+  const combo = page.locator('.langs select');
+  await combo.waitFor({ state: 'attached' });
+  return combo.inputValue();
+}
+
+/**
+ * 우측 패널의 Properties 탭을 클릭하여 활성화하고, 패널 콘텐츠가 렌더링될 때까지 대기한다.
+ * - 탭 셀렉터: #right-panel-wrap .el-tabs__item (text = "Properties")
+ * - 패널 컨테이너: #component-property-panel (ComponentPropertyPanel.vue)
+ */
+async function openPropertiesPanel(page) {
+  const propTab = page.locator('#right-panel-wrap .el-tabs__item')
+    .filter({ hasText: 'Properties' })
+    .first();
+  if (await propTab.count() > 0) {
+    await propTab.click();
+  }
+  await page.locator('#component-property-panel').waitFor({ state: 'visible', timeout: 10000 });
+}
+
+async function savePage(page, saveAsName = null) {
+  if (saveAsName) {
+    // '다른 이름으로 저장' 호출
+    await page.evaluate(() => {
+      window.wemb.editorFacade.sendNotification('command/showSaveAsPageModal');
+    });
+
+    // evaluate 내 DOM click은 합성 이벤트라 Vue submit handler가 트리거되지 않으므로
+    // Playwright locator의 fill() + click()으로 교체합니다.
+    // SaveAs 모달: command/showSaveAsPageModal → $createPageModal.showSaveAsPage()
+    // vue-js-modal 오버레이: data-modal="createPageModal", 박스: .v--modal-box[role="dialog"]
+    const dialog = page.locator('[data-modal="createPageModal"] .v--modal-box').first();
+    await dialog.waitFor({ state: 'visible', timeout: 10000 });
+
+    const input = dialog.locator('#pageName, #pageName2').first();
+    await input.waitFor({ state: 'visible' });
+    await input.fill(saveAsName);
+
+    const saveBtn = dialog.locator('button')
+      .filter({ hasText: /저장|생성|Create|Save|OK|확인/i })
+      .last();
+    await saveBtn.click();
+  } else {
+    await page.evaluate(() => {
+      window.wemb.editorFacade.sendNotification('command/savePage');
+    });
+  }
+  await page.waitForTimeout(2000);
 }
 
 async function addThreeBox(page, name, position) {
@@ -611,16 +756,25 @@ module.exports = {
   ensureEditorSession,
   ensureActivePage,
   ensureTestPage,
+  getActiveLayerName,
   getComponentState,
+  getSelectedLanguage,
   getSelectedComponentStates,
   getThreeLayerState,
   goToEditor,
   loginAsEditor,
+  loginAsViewer,
   moveSelectedByKeyboard,
+  openNewPageModal,
+  openPropertiesPanel,
+  rightClickTreeItem,
+  selectContextMenu,
   savePage,
   selectThreeComponents,
+  setEditorMode,
   setLoginCredentials,
   setThreeTransformMode,
+  submitLogin,
   switchToThreeLayer,
   switchToTwoLayer,
   waitForActiveEditorPage,

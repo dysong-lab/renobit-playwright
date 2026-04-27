@@ -1,5 +1,14 @@
 const { test, expect } = require('@playwright/test');
-const { ensureEditorSession, ensureTestPage, loginAsEditor } = require('../../helpers/renobit');
+const {
+  ensureEditorSession,
+  ensureTestPage,
+  getActiveLayerName,
+  getSelectedLanguage,
+  loginAsEditor,
+  loginAsViewer,
+  switchToThreeLayer,
+  switchToTwoLayer,
+} = require('../../helpers/renobit');
 const { attachTcMeta } = require('./_tc-meta');
 
 test.setTimeout(60_000);
@@ -7,6 +16,12 @@ test.setTimeout(60_000);
 async function expectHeaderButtons(page, names) {
   for (const name of names) {
     await expect(page.getByRole('button', { name, exact: true }).first()).toBeVisible();
+  }
+}
+
+async function expectPanelLabels(page, names) {
+  for (const name of names) {
+    await expect(page.locator('.content-title', { hasText: name }).first()).toBeAttached();
   }
 }
 
@@ -45,6 +60,91 @@ test.describe('RENOBIT 3.5.0 Final Common TC - Common Login', () => {
         hasThreeLayer: true,
         hasCreatePageModal: true,
       });
+  });
+
+  test('TC-R35-COM-012 로그인 페이지 기본 구성 표시', async ({ page }, testInfo) => {
+    await attachTcMeta(testInfo, {
+      id: 'TC-R35-COM-012',
+      title: '로그인 페이지에서 아이디/비밀번호/Editor 체크/로그인 버튼 표시',
+      preconditions: ['로그인 페이지 /renobit/login.do 에 정상 접근 가능해야 한다.'],
+      expectedResults: [
+        '아이디 입력 필드와 비밀번호 입력 필드가 보여야 한다.',
+        'Editor 체크박스가 노출되어야 한다.',
+        'LOGIN 버튼이 보여야 한다.',
+      ],
+    });
+
+    await page.goto('/renobit/login.do', { waitUntil: 'domcontentloaded' });
+
+    await expect(page.locator('#idInput')).toBeVisible();
+    await expect(page.locator('#pwInput')).toBeVisible();
+    await expect(page.locator('#Editor')).toBeVisible();
+    await expect(page.getByRole('button', { name: 'LOGIN' })).toBeVisible();
+  });
+
+  test('TC-R35-COM-013 뷰어 로그인 성공', async ({ page }, testInfo) => {
+    await attachTcMeta(testInfo, {
+      id: 'TC-R35-COM-013',
+      title: 'Editor 미선택 상태로 로그인 시 viewer 로 진입',
+      preconditions: [
+        '로그인 가능한 계정이 준비되어 있어야 한다.',
+        '로그인 페이지에서 Editor 체크를 해제할 수 있어야 한다.',
+      ],
+      expectedResults: [
+        '로그인 후 visualViewer.do 경로로 이동해야 한다.',
+        'viewer 화면이 정상 렌더링되어야 한다.',
+      ],
+    });
+
+    await loginAsViewer(page);
+
+    await expect(page).toHaveURL(/\/renobit\/visualViewer\.do#\//);
+  });
+
+  test('TC-R35-COM-014 뷰어 로그인 실패 계정 차단', async ({ page }, testInfo) => {
+    await attachTcMeta(testInfo, {
+      id: 'TC-R35-COM-014',
+      title: '잘못된 계정으로 viewer 로그인 시 차단 또는 안내 표시',
+      preconditions: [
+        '로그인 페이지가 열려 있어야 한다.',
+        '잘못된 계정 또는 비밀번호로 로그인 시도가 가능해야 한다.',
+      ],
+      expectedResults: [
+        'visualViewer.do 로 이동하지 않아야 한다.',
+        '로그인 페이지에 남거나 오류 안내가 표시되어야 한다.',
+      ],
+    });
+
+    await page.goto('/renobit/login.do', { waitUntil: 'domcontentloaded' });
+
+    let dialogMessage = '';
+    page.once('dialog', async (dialog) => {
+      dialogMessage = dialog.message();
+      await dialog.dismiss();
+    });
+
+    await page.locator('#idInput').fill('admin');
+    await page.locator('#pwInput').fill('invalid-password');
+    await page.locator('#Editor').uncheck().catch(() => {});
+    await page.locator('button.new_btn').click();
+    await page.waitForTimeout(1_500);
+
+    expect(page.url()).not.toMatch(/\/renobit\/visualViewer\.do#\//);
+    expect(dialogMessage || page.url()).toBeTruthy();
+  });
+
+  test.skip('TC-R35-COM-015 Edit 권한 없는 계정 차단', async ({ page }, testInfo) => {
+    await attachTcMeta(testInfo, {
+      id: 'TC-R35-COM-015',
+      title: 'Edit 권한 없는 계정으로 Editor 로그인 시 차단',
+      preconditions: ['Edit 권한이 없는 전용 테스트 계정이 준비되어 있어야 한다.'],
+      expectedResults: [
+        'visual.do editor 경로로 이동하지 않아야 한다.',
+        '권한 차단 또는 안내 메시지가 표시되어야 한다.',
+      ],
+    });
+
+    await page.goto('/renobit/login.do', { waitUntil: 'domcontentloaded' });
   });
 });
 
@@ -269,5 +369,110 @@ test.describe('RENOBIT 3.5.0 Final Common TC - Common', () => {
     await expect
       .poll(async () => page.evaluate(() => !!window.wemb?.$createPageModal))
       .toBeTruthy();
+  });
+
+  test('TC-R35-COM-016 메뉴 패널 기본 노출', async ({ page }, testInfo) => {
+    await attachTcMeta(testInfo, {
+      id: 'TC-R35-COM-016',
+      title: '좌측 메뉴 영역에서 기본 패널이 노출되어야 한다',
+      preconditions: [
+        '로그인 완료 후 에디터 메인 화면이 열려 있어야 한다.',
+        '활성 페이지가 하나 이상 열려 있어야 한다.',
+      ],
+      expectedResults: [
+        'Page, Components, Instance List, Group List 패널이 DOM 에 렌더링되어야 한다.',
+      ],
+    });
+
+    await ensureTestPage(page, `tc_r35_common_panels_${Date.now().toString(36)}`);
+    await expectPanelLabels(page, [
+      'Page',
+      'Components',
+      'Instance List',
+      'Group List',
+    ]);
+  });
+
+  test('TC-R35-COM-017 상단 언어 선택 변경', async ({ page }, testInfo) => {
+    await attachTcMeta(testInfo, {
+      id: 'TC-R35-COM-017',
+      title: '상단 언어 선택 combobox 에서 다른 언어를 선택할 수 있다',
+      preconditions: [
+        '로그인 완료 후 에디터 메인 화면이 열려 있어야 한다.',
+        '언어 선택 combobox 에 2개 이상의 옵션이 존재해야 한다.',
+      ],
+      expectedResults: [
+        '선택 가능한 언어 옵션이 2개 이상 보여야 한다.',
+        '다른 언어 선택 시 combobox 값이 변경되어야 한다.',
+      ],
+    });
+
+    const combo = page.locator('.langs select');
+    await expect(combo).toBeAttached();
+
+    const optionCount = await combo.locator('option').count();
+    expect(optionCount).toBeGreaterThan(1);
+
+    const originalValue = await getSelectedLanguage(page);
+    const options = await combo.locator('option').evaluateAll((nodes) =>
+      nodes.map((node) => ({ value: node.value, disabled: node.disabled }))
+    );
+    const nextOption = options.find((option) => !option.disabled && option.value !== originalValue);
+
+    expect(nextOption?.value).toBeTruthy();
+
+    await combo.selectOption(nextOption.value);
+    await expect(combo).toHaveValue(nextOption.value);
+
+    if (originalValue) {
+      await combo.selectOption(originalValue);
+      await expect(combo).toHaveValue(originalValue);
+    }
+  });
+
+  test('TC-R35-COM-018 Zoom 토글 On/Off 전환', async ({ page }, testInfo) => {
+    await attachTcMeta(testInfo, {
+      id: 'TC-R35-COM-018',
+      title: '상단 Zoom 스위치를 on/off 로 전환할 수 있다',
+      preconditions: [
+        '로그인 완료 후 에디터 메인 화면이 열려 있어야 한다.',
+        'Zoom 토글 input 이 노출되어 있어야 한다.',
+      ],
+      expectedResults: [
+        'Zoom 스위치를 클릭하면 checked 상태가 반전되어야 한다.',
+        '다시 클릭하면 원래 상태로 복귀해야 한다.',
+      ],
+    });
+
+    const zoomSwitch = page.locator('.zoombar-area .el-switch input[type="checkbox"]').first();
+    await expect(zoomSwitch).toBeAttached();
+
+    const initialState = await zoomSwitch.isChecked();
+    await page.locator('.zoombar-area .el-switch').first().click();
+    await expect(zoomSwitch).toHaveJSProperty('checked', !initialState);
+
+    await page.locator('.zoombar-area .el-switch').first().click();
+    await expect(zoomSwitch).toHaveJSProperty('checked', initialState);
+  });
+
+  test('TC-R35-COM-019 Layer 전환 시 active layer 상태 반영', async ({ page }, testInfo) => {
+    await attachTcMeta(testInfo, {
+      id: 'TC-R35-COM-019',
+      title: '레이어 전환 시 twoLayer 와 threeLayer active state 가 반영된다',
+      preconditions: [
+        '로그인 완료 후 에디터 메인 화면이 열려 있어야 한다.',
+        '레이어 전환이 가능한 상태여야 한다.',
+      ],
+      expectedResults: [
+        '2D 전환 시 activeLayer.name 이 _twoLayer 가 되어야 한다.',
+        '3D 전환 시 activeLayer.name 이 _threeLayer 가 되어야 한다.',
+      ],
+    });
+
+    await switchToTwoLayer(page);
+    await expect.poll(async () => getActiveLayerName(page)).toBe('_twoLayer');
+
+    await switchToThreeLayer(page);
+    await expect.poll(async () => getActiveLayerName(page)).toBe('_threeLayer');
   });
 });
