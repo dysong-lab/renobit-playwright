@@ -3,3 +3,4 @@ playwright-report/
 test-results/
 storageState.json
 *.log
+.claude/settings.local.json
