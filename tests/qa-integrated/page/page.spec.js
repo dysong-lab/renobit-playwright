@@ -9,9 +9,9 @@ const {
 } = require('../../helpers/renobit');
 
 test.describe('PAGE Module Tests', () => {
-  // 에디터 로딩 시간이 걸릴 수 있으므로 120초 타임아웃 부여
-  // (페이지 생성마다 isLoaded 대기가 추가되어 복수 페이지 생성 테스트는 60초 초과 가능)
-  test.setTimeout(120_000);
+  // 에디터 로딩 시간이 걸릴 수 있으므로 180초 타임아웃 부여
+  // (마스터 페이지 포함 로딩, 페이지 생성마다 isLoaded 대기 등으로 120초 초과 가능)
+  test.setTimeout(180_000);
 
   test.beforeEach(async ({ page }) => {
     // 렌더링 검사/조작을 위해 공통적으로 에디터 세션 복원 및 테스트 페이지 오픈 보장
