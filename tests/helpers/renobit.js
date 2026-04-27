@@ -297,8 +297,28 @@ async function createPageByType(page, { type = 'page', name, mobile = false }) {
   // 1. showNewPage(type)으로 모달 오픈 — input이 DOM에 붙을 때까지 최대 3회 재시도
   // (소스: ShowNewPageModalCommand.ts → $createPageModal.showNewPage(createType))
   for (let i = 0; i < 3; i++) {
-    await page.evaluate((createType) => {
-      window.wemb.$createPageModal.showNewPage(createType);
+    await page.evaluate(async (createType) => {
+      const modal = window.wemb.$createPageModal;
+      try {
+        modal.showNewPage(createType);
+      } catch (e) {
+        // showNewPage가 threeLayer 미초기화(master 페이지 상태 등)로 실패할 경우 직접 세팅
+        if (typeof createType !== 'string') createType = 'page';
+        modal.createType = createType;
+        modal.saveAs = false;
+        modal.isMobile = false;
+        modal.pageMasterList = window.wemb?.pageTreeDataManager?.treeData || [];
+        if (modal.pageInfoProperties) {
+          modal.pageInfoProperties.id = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+            const r = Math.random() * 16 | 0;
+            return (c === 'x' ? r : (r & 0x3) | 0x8).toString(16);
+          });
+          modal.pageInfoProperties.name = '';
+        }
+        modal.active = true;
+        modal.$modal.show('createPageModal');
+      }
+      await new Promise(r => modal.$nextTick(r));
     }, type);
     const attached = await page.locator('#pageName, #pageName2').first()
       .waitFor({ state: 'attached', timeout: 5000 })
