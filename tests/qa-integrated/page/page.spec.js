@@ -504,8 +504,8 @@ test.describe('PAGE Module Tests', () => {
     await rightClickTreeItem(page, currentPageName);
     await selectContextMenu(page, /Rename|이름 수정/i);
     
-    // 트리 내 입력창 활성화 확인
-    const renameInput = page.locator('input.jstree-edit-input').first();
+    // 트리 내 입력창 활성화 확인 (jstree rename input class: jstree-rename-input)
+    const renameInput = page.locator('input.jstree-rename-input').first();
     await expect(renameInput).toBeVisible();
   });
 
