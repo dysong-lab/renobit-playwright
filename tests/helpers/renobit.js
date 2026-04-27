@@ -246,8 +246,17 @@ async function closeCreatePageModalIfVisible(page) {
  * jstree의 특정 항목을 우클릭하여 컨텍스트 메뉴를 호출합니다.
  */
 async function rightClickTreeItem(page, itemName) {
-  // jstree가 DOM에 마운트될 때까지 대기
-  await page.waitForSelector('.jstree', { state: 'attached', timeout: 10000 }).catch(() => {});
+  // SideNavbar의 activeIndex가 null이면 .panel-content가 display:none이 되어
+  // jstree가 a.jstree-anchor 요소를 생성하지 않음 → 'listbar-1'(페이지 트리)로 활성화
+  await page.evaluate(() => {
+    const sideNavbar = window.wemb?.viewComponentMap?.get('SideNavbarMediator');
+    if (sideNavbar && sideNavbar.activeIndex !== 'listbar-1') {
+      sideNavbar.activeIndex = 'listbar-1';
+    }
+  }).catch(() => {});
+
+  // jstree 패널이 표시되고 anchor가 DOM에 생성될 때까지 대기
+  await page.waitForSelector('a.jstree-anchor', { state: 'attached', timeout: 10000 }).catch(() => {});
 
   // collapse된 부모 노드 아래 anchor가 hidden 상태일 수 있으므로 모든 jstree 노드 펼치기
   await page.evaluate(() => {
