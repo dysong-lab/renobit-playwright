@@ -241,6 +241,9 @@ async function closeCreatePageModalIfVisible(page) {
  * jstree의 특정 항목을 우클릭하여 컨텍스트 메뉴를 호출합니다.
  */
 async function rightClickTreeItem(page, itemName) {
+  // jstree가 DOM에 마운트될 때까지 대기
+  await page.waitForSelector('.jstree', { state: 'attached', timeout: 10000 }).catch(() => {});
+
   // collapse된 부모 노드 아래 anchor가 hidden 상태일 수 있으므로 모든 jstree 노드 펼치기
   await page.evaluate(() => {
     document.querySelectorAll('.jstree').forEach(tree => {
@@ -248,9 +251,13 @@ async function rightClickTreeItem(page, itemName) {
     });
   }).catch(() => {});
 
+  // open_all 애니메이션/렌더링 완료 대기
+  await page.waitForTimeout(500);
+
   const anchor = page.locator('a.jstree-anchor').filter({ hasText: itemName }).first();
-  await anchor.waitFor({ state: 'visible', timeout: 10000 });
-  await anchor.scrollIntoViewIfNeeded();
+  // dispatchEvent는 visibility 불필요 — attached만 확인
+  await anchor.waitFor({ state: 'attached', timeout: 10000 });
+  await anchor.scrollIntoViewIfNeeded().catch(() => {});
 
   // click({ button: 'right' }) 대신 dispatchEvent 사용하여 jstree 이벤트 확실히 트리거
   await anchor.dispatchEvent('contextmenu');
