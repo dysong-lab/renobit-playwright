@@ -280,63 +280,57 @@ async function selectContextMenu(page, labelRegex) {
  * (소스: ShowNewPageModalCommand.ts → $createPageModal.showNewPage(createType))
  */
 async function openNewPageModal(page) {
-  const modal = page.getByRole('dialog').first();
-
   for (let i = 0; i < 3; i++) {
     await page.waitForTimeout(500);
     await page.evaluate(() => {
       window.wemb.$createPageModal?.showNewPage?.('page');
     });
-
-    try {
-      await modal.waitFor({ state: 'visible', timeout: 3000 });
-      return;
-    } catch (e) {
-      // 렌더링 애니메이션이나 Vue 상태 충돌로 모달이 열리지 않았을 수 있으므로 재시도
-      console.log('Retrying openNewPageModal...');
-    }
+    const attached = await page.locator('#pageName, #pageName2').first()
+      .waitFor({ state: 'attached', timeout: 3000 })
+      .then(() => true).catch(() => false);
+    if (attached) return;
   }
-
-  await modal.waitFor({ state: 'visible', timeout: 5000 });
+  await page.locator('#pageName, #pageName2').first().waitFor({ state: 'attached', timeout: 5000 });
 }
 
 async function createPageByType(page, { type = 'page', name, mobile = false }) {
-  // 1. showNewPage(type)으로 모달 오픈과 타입 선택을 동시에 처리
+  // 1. showNewPage(type)으로 모달 오픈 — input이 DOM에 붙을 때까지 최대 3회 재시도
   // (소스: ShowNewPageModalCommand.ts → $createPageModal.showNewPage(createType))
   for (let i = 0; i < 3; i++) {
     await page.evaluate((createType) => {
       window.wemb.$createPageModal.showNewPage(createType);
     }, type);
-    const appeared = await page.locator('#pageName, #pageName2').first()
-      .waitFor({ state: 'visible', timeout: 5000 })
+    const attached = await page.locator('#pageName, #pageName2').first()
+      .waitFor({ state: 'attached', timeout: 5000 })
       .then(() => true).catch(() => false);
-    if (appeared) break;
+    if (attached) break;
+    await page.waitForTimeout(300);
   }
 
-  // 2. 이름 입력 input 기준으로 모달 준비 확인
+  // 2. input 기준으로 모달 준비 확인 (vue-js-modal transition 중 opacity:0이어도 attached는 true)
   // page/master: #pageName, group: #pageName2 (CreatePageModal.vue v-if/v-else 분기)
   const nameInput = page.locator('#pageName, #pageName2').first();
-  await nameInput.waitFor({ state: 'visible', timeout: 5000 });
+  await nameInput.waitFor({ state: 'attached', timeout: 5000 });
 
   // 3. Mobile Master 체크 (master 타입일 때만)
   if (type === 'master' && mobile) {
     const mobileCheckbox = page.locator('label.el-checkbox').filter({ hasText: /Mobile\s*Master/i }).first();
     const isChecked = await mobileCheckbox.locator('input').isChecked();
     if (!isChecked) {
-      await mobileCheckbox.click();
+      await mobileCheckbox.click({ force: true });
     }
     await page.waitForTimeout(200);
   }
 
-  // 4. 이름 입력
-  await nameInput.fill(name);
+  // 4. 이름 입력 — force:true로 CSS visibility 체크 우회
+  await nameInput.fill(name, { force: true });
 
   // 5. 생성 버튼 클릭
   const createBtn = page.locator('button').filter({ hasText: /생성|Create|OK/i }).last();
-  await createBtn.click();
+  await createBtn.click({ force: true });
 
-  // 6. 모달 닫힘 대기 — input이 사라지면 닫힌 것으로 판단
-  await nameInput.waitFor({ state: 'hidden', timeout: 10000 }).catch(() => {});
+  // 6. 모달 닫힘 대기 — input이 DOM에서 제거되면 닫힌 것으로 판단
+  await nameInput.waitFor({ state: 'detached', timeout: 10000 }).catch(() => {});
 
   // 6. 새 페이지 로딩 완료 대기
   // isLoaded === true는 이전 페이지 상태와 구분이 안 되므로, 새 페이지 ID 기반으로 대기.
