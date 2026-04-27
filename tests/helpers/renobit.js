@@ -303,16 +303,24 @@ async function openNewPageModal(page) {
 async function createPageByType(page, { type = 'page', name, mobile = false }) {
   // 1. showNewPage(type)으로 모달 오픈과 타입 선택을 동시에 처리
   // (소스: ShowNewPageModalCommand.ts → $createPageModal.showNewPage(createType))
-  await page.evaluate((createType) => {
-    window.wemb.$createPageModal.showNewPage(createType);
-  }, type);
+  for (let i = 0; i < 3; i++) {
+    await page.evaluate((createType) => {
+      window.wemb.$createPageModal.showNewPage(createType);
+    }, type);
+    const appeared = await page.locator('#pageName, #pageName2').first()
+      .waitFor({ state: 'visible', timeout: 5000 })
+      .then(() => true).catch(() => false);
+    if (appeared) break;
+  }
 
-  const modal = page.getByRole('dialog').first();
-  await modal.waitFor({ state: 'visible', timeout: 15000 });
+  // 2. 이름 입력 input 기준으로 모달 준비 확인
+  // page/master: #pageName, group: #pageName2 (CreatePageModal.vue v-if/v-else 분기)
+  const nameInput = page.locator('#pageName, #pageName2').first();
+  await nameInput.waitFor({ state: 'visible', timeout: 5000 });
 
-  // 2. Mobile Master 체크 (master 타입일 때만)
+  // 3. Mobile Master 체크 (master 타입일 때만)
   if (type === 'master' && mobile) {
-    const mobileCheckbox = modal.locator('label.el-checkbox').filter({ hasText: /Mobile\s*Master/i }).first();
+    const mobileCheckbox = page.locator('label.el-checkbox').filter({ hasText: /Mobile\s*Master/i }).first();
     const isChecked = await mobileCheckbox.locator('input').isChecked();
     if (!isChecked) {
       await mobileCheckbox.click();
@@ -320,18 +328,15 @@ async function createPageByType(page, { type = 'page', name, mobile = false }) {
     await page.waitForTimeout(200);
   }
 
-  // 3. 이름 입력
-  // page/master: #pageName, group: #pageName2 (CreatePageModal.vue v-if/v-else 분기)
-  const nameInput = modal.locator('#pageName, #pageName2').first();
-  await nameInput.waitFor({ state: 'visible' });
+  // 4. 이름 입력
   await nameInput.fill(name);
 
-  // 4. 생성 버튼 클릭
-  const createBtn = modal.locator('button').filter({ hasText: /생성|Create|OK/i }).last();
+  // 5. 생성 버튼 클릭
+  const createBtn = page.locator('button').filter({ hasText: /생성|Create|OK/i }).last();
   await createBtn.click();
 
-  // 5. 모달 닫힘 대기
-  await modal.waitFor({ state: 'hidden', timeout: 10000 }).catch(() => {});
+  // 6. 모달 닫힘 대기 — input이 사라지면 닫힌 것으로 판단
+  await nameInput.waitFor({ state: 'hidden', timeout: 10000 }).catch(() => {});
 
   // 6. 새 페이지 로딩 완료 대기
   // isLoaded === true는 이전 페이지 상태와 구분이 안 되므로, 새 페이지 ID 기반으로 대기.
