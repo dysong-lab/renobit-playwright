@@ -255,22 +255,28 @@ async function rightClickTreeItem(page, itemName) {
     }
   }).catch(() => {});
 
-  // jstree 패널이 표시되고 anchor가 DOM에 생성될 때까지 대기
-  await page.waitForSelector('a.jstree-anchor', { state: 'attached', timeout: 10000 }).catch(() => {});
+  // jstree 패널이 표시될 때까지 대기
+  await page.waitForSelector('.jstree', { state: 'visible', timeout: 10000 }).catch(() => {});
 
   // collapse된 부모 노드 아래 anchor가 hidden 상태일 수 있으므로 모든 jstree 노드 펼치기
+  // jstree('open_all') 호출 후 DOM 반영을 위해 약간의 대기 필요
   await page.evaluate(() => {
     document.querySelectorAll('.jstree').forEach(tree => {
-      if (window.$ && $.fn.jstree) $(tree).jstree('open_all');
+      if (window.$ && $.fn.jstree) {
+        $(tree).jstree('open_all');
+      }
     });
   }).catch(() => {});
 
   // open_all 애니메이션/렌더링 완료 대기
-  await page.waitForTimeout(500);
+  await page.waitForTimeout(1000);
 
-  const anchor = page.locator('a.jstree-anchor').filter({ hasText: itemName }).first();
-  // dispatchEvent는 visibility 불필요 — attached만 확인
-  await anchor.waitFor({ state: 'attached', timeout: 10000 });
+  // jstree-anchor가 여러 개일 수 있으므로 텍스트로 정확히 필터링
+  // 아이콘 문자열( 등)이 포함될 수 있으므로 Regex substring 매치 사용
+  const anchor = page.locator('.jstree-anchor').filter({ hasText: new RegExp(itemName) }).first();
+  
+  // 요소가 DOM에 붙고 상호작용 가능할 때까지 대기
+  await anchor.waitFor({ state: 'attached', timeout: 15000 });
   await anchor.scrollIntoViewIfNeeded().catch(() => {});
 
   // click({ button: 'right' }) 대신 dispatchEvent 사용하여 jstree 이벤트 확실히 트리거
@@ -289,10 +295,15 @@ async function selectContextMenu(page, labelRegex) {
   const item = page.locator('.vakata-context li > a')
     .filter({ hasText: labelRegex })
     .first();
+  
   await item.waitFor({ state: 'visible', timeout: 5000 });
-  // hover로 서브메뉴 펼침 (서브메뉴가 없는 항목에도 무해함)
+  
+  // hover로 서브메뉴가 있는 경우 펼침 유도
   await item.hover();
-  await item.click();
+  await page.waitForTimeout(200);
+  
+  // force: true를 사용하여 다른 오버레이 등에 가려진 경우에도 클릭 허용
+  await item.click({ force: true });
 }
 
 /**

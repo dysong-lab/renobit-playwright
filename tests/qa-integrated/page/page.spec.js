@@ -522,18 +522,34 @@ test.describe('PAGE Module Tests', () => {
     await rightClickTreeItem(page, pageName);
     await selectContextMenu(page, /Delete|삭제/i);
     
-    // 삭제 확인 다이얼로그 (ElementUI MessageBox)
-    const deleteDialog = page.locator('.el-message-box, .v--modal-box').filter({ hasText: /삭제|Delete|Confirm/i }).first();
-    await expect(deleteDialog).toBeVisible();
+    // Stage 1: 'DELETE' 입력 프롬프트 (el-message-box__input이 있는 경우)
+    const promptDialog = page.locator('.el-message-box').filter({ has: page.locator('.el-message-box__input') }).first();
+    if (await promptDialog.isVisible({ timeout: 5000 }).catch(() => false)) {
+      const promptInput = promptDialog.locator('.el-message-box__input input');
+      await promptInput.fill('DELETE');
+      const confirmBtn = promptDialog.locator('.el-message-box__btns .el-button--primary');
+      await confirmBtn.click();
+      await expect(promptDialog).toBeHidden({ timeout: 5000 });
+    }
     
-    // 'DELETE' 입력
-    const confirmInput = deleteDialog.locator('input').first();
-    await confirmInput.fill('DELETE');
+    // Stage 2: 최종 삭제 확인 (정말로 삭제하시겠습니까?)
+    const confirmDialog = page.locator('.el-message-box').filter({ hasText: /정말로 삭제|되돌릴 수 없습니다/i }).first();
+    if (await confirmDialog.isVisible({ timeout: 5000 }).catch(() => false)) {
+      const deleteBtn = confirmDialog.locator('.el-message-box__btns .el-button--primary');
+      await deleteBtn.click({ force: true });
+      await expect(confirmDialog).toBeHidden({ timeout: 10000 });
+    }
     
-    const confirmBtn = deleteDialog.locator('button').filter({ hasText: /삭제|OK|Confirm|확인/i }).first();
-    await confirmBtn.click();
-    
-    await page.waitForTimeout(2000);
+    // 트리 데이터에서 실제로 제거되었는지 비동기 대기 검증
+    await page.waitForFunction(
+      (name) => {
+        const tree = window.wemb?.pageTreeDataManager?.treeData || [];
+        return !tree.some(i => i.text === name);
+      },
+      pageName,
+      { timeout: 15000 }
+    );
+
     const isDeleted = await page.evaluate((name) => {
       const tree = window.wemb.pageTreeDataManager.treeData || [];
       return !tree.some(i => i.text === name);
