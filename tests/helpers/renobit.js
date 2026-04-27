@@ -280,7 +280,7 @@ async function selectContextMenu(page, labelRegex) {
  * (소스: ShowNewPageModalCommand.ts → $createPageModal.showNewPage(createType))
  */
 async function openNewPageModal(page) {
-  const modal = page.locator('[data-modal="createPageModal"] .v--modal-box, #createPageModal').first();
+  const modal = page.locator('[data-modal="createPageModal"] .v--modal-box, #createPageModal, dialog:has(button:text("생성"))').first();
 
   for (let i = 0; i < 3; i++) {
     await page.waitForTimeout(500);
@@ -307,7 +307,7 @@ async function createPageByType(page, { type = 'page', name, mobile = false }) {
     window.wemb.$createPageModal.showNewPage(createType);
   }, type);
 
-  const modal = page.locator('[data-modal="createPageModal"] .v--modal-box, #createPageModal').first();
+  const modal = page.locator('[data-modal="createPageModal"] .v--modal-box, #createPageModal, dialog:has(button:text("생성"))').first();
   await modal.waitFor({ state: 'visible', timeout: 15000 });
 
   // 2. Mobile Master 체크 (master 타입일 때만)
