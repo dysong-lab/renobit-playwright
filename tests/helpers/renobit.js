@@ -225,7 +225,7 @@ async function findPageIdByName(page, pageName) {
 }
 
 async function closeCreatePageModalIfVisible(page) {
-  const modal = page.locator('#createPageModal');
+  const modal = page.getByRole('dialog').first();
   if (!(await modal.isVisible().catch(() => false))) {
     return;
   }
@@ -280,7 +280,7 @@ async function selectContextMenu(page, labelRegex) {
  * (소스: ShowNewPageModalCommand.ts → $createPageModal.showNewPage(createType))
  */
 async function openNewPageModal(page) {
-  const modal = page.locator('[data-modal="createPageModal"] .v--modal-box, #createPageModal, dialog:has(button:text("생성"))').first();
+  const modal = page.getByRole('dialog').first();
 
   for (let i = 0; i < 3; i++) {
     await page.waitForTimeout(500);
@@ -307,7 +307,7 @@ async function createPageByType(page, { type = 'page', name, mobile = false }) {
     window.wemb.$createPageModal.showNewPage(createType);
   }, type);
 
-  const modal = page.locator('[data-modal="createPageModal"] .v--modal-box, #createPageModal, dialog:has(button:text("생성"))').first();
+  const modal = page.getByRole('dialog').first();
   await modal.waitFor({ state: 'visible', timeout: 15000 });
 
   // 2. Mobile Master 체크 (master 타입일 때만)
@@ -484,7 +484,7 @@ async function savePage(page, saveAsName = null) {
     // Playwright locator의 fill() + click()으로 교체합니다.
     // SaveAs 모달: command/showSaveAsPageModal → $createPageModal.showSaveAsPage()
     // vue-js-modal 오버레이: data-modal="createPageModal", 박스: .v--modal-box[role="dialog"]
-    const dialog = page.locator('[data-modal="createPageModal"] .v--modal-box').first();
+    const dialog = page.getByRole('dialog').first();
     await dialog.waitFor({ state: 'visible', timeout: 10000 });
 
     const input = dialog.locator('#pageName, #pageName2').first();
