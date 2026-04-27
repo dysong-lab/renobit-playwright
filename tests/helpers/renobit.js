@@ -168,18 +168,23 @@ async function waitForActiveEditorPage(page, pageId) {
     (id) => {
       const currentId = window.wemb?.pageManager?.currentPageInfo?.id;
       const isLoaded = window.wemb?.mainPageComponent?.isLoaded === true;
+      const isLoading = window.wemb?.mainPageComponent?.isLoading === true;
       const pageType = window.wemb?.pageManager?.currentPageInfo?.type;
 
-      if (currentId !== id || !isLoaded) return false;
+      if (currentId !== id) return false;
+      // 로딩 중이면 대기
+      if (!isLoaded && isLoading) return false;
+      // isLoading=false로 멈춘 경우(OpenPageCommand 에러 경로): 진행 허용
+      if (!isLoaded) return true;
       if (pageType === 'master') return true;
-      
+
       let configObj = window.wemb?.pageManager?.currentPageInfo?.config;
       if (typeof configObj === 'string') {
          try { configObj = JSON.parse(configObj); } catch(e) {}
       }
       const is3D = configObj?.three === true || configObj?.three === "true";
       if (!is3D) return true;
-      
+
       return !!window.wemb?.mainPageComponent?.threeLayer;
     },
     pageId,
