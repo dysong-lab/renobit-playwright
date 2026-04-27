@@ -503,17 +503,14 @@ async function savePage(page, saveAsName = null) {
     // Playwright locator의 fill() + click()으로 교체합니다.
     // SaveAs 모달: command/showSaveAsPageModal → $createPageModal.showSaveAsPage()
     // vue-js-modal 오버레이: data-modal="createPageModal", 박스: .v--modal-box[role="dialog"]
-    const dialog = page.getByRole('dialog').first();
-    await dialog.waitFor({ state: 'visible', timeout: 10000 });
+    const input = page.locator('#pageName, #pageName2').first();
+    await input.waitFor({ state: 'attached', timeout: 10000 });
+    await input.fill(saveAsName, { force: true });
 
-    const input = dialog.locator('#pageName, #pageName2').first();
-    await input.waitFor({ state: 'visible' });
-    await input.fill(saveAsName);
-
-    const saveBtn = dialog.locator('button')
+    const saveBtn = page.locator('button')
       .filter({ hasText: /저장|생성|Create|Save|OK|확인/i })
       .last();
-    await saveBtn.click();
+    await saveBtn.click({ force: true });
   } else {
     await page.evaluate(() => {
       window.wemb.editorFacade.sendNotification('command/savePage');
