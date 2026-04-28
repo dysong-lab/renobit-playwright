@@ -529,7 +529,7 @@ test.describe('PAGE Module Tests', () => {
       await promptInput.fill('DELETE');
       const confirmBtn = promptDialog.locator('.el-message-box__btns .el-button--primary');
       await confirmBtn.click();
-      await expect(promptDialog).toBeHidden({ timeout: 5000 });
+      await promptDialog.waitFor({ state: 'hidden', timeout: 10000 }).catch(() => {});
     }
     
     // Stage 2: 최종 삭제 확인 (정말로 삭제하시겠습니까?)

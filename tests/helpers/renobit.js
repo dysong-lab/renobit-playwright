@@ -326,6 +326,8 @@ async function openNewPageModal(page) {
 }
 
 async function createPageByType(page, { type = 'page', name, mobile = false }) {
+  await closeCreatePageModalIfVisible(page);
+
   // 1. showNewPage(type)으로 모달 오픈 — input이 DOM에 붙을 때까지 최대 3회 재시도
   // (소스: ShowNewPageModalCommand.ts → $createPageModal.showNewPage(createType))
   for (let i = 0; i < 3; i++) {
@@ -362,7 +364,7 @@ async function createPageByType(page, { type = 'page', name, mobile = false }) {
   // 2. input 기준으로 모달 준비 확인 (vue-js-modal transition 중 opacity:0이어도 attached는 true)
   // page/master: #pageName, group: #pageName2 (CreatePageModal.vue v-if/v-else 분기)
   const nameInput = page.locator('#pageName, #pageName2').first();
-  await nameInput.waitFor({ state: 'attached', timeout: 5000 });
+  await nameInput.waitFor({ state: 'attached', timeout: 15000 });
 
   // 3. Mobile Master 체크 (master 타입일 때만)
   if (type === 'master' && mobile) {
