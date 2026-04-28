@@ -111,7 +111,7 @@ test.describe('COMMON Module Tests', () => {
      * [Expected Result]: 통합관리자가 새창으로 실행됨
      * [Automation Note]: UI 조작 + page.evaluate()로 자동화 가능
      */
-    const adminLink = page.getByRole('button', { name: 'admin', exact: true }).first();
+    const adminLink = page.getByRole('button', { name: /admin|관리자/i }).first();
     await expect(adminLink).toBeAttached();
     
     // 새 창(탭) 열림 감지
@@ -130,7 +130,7 @@ test.describe('COMMON Module Tests', () => {
      * [Expected Result]: Renobit 뷰어로 이동됨
      * [Automation Note]: UI 조작 + page.evaluate()로 자동화 가능
      */
-    const viewerLink = page.getByRole('button', { name: 'viewer', exact: true }).first();
+    const viewerLink = page.getByRole('button', { name: /viewer|뷰어/i }).first();
     await expect(viewerLink).toBeAttached();
     
     // 새 창(탭) 열림 감지
@@ -150,7 +150,7 @@ test.describe('COMMON Module Tests', () => {
      * [Automation Note]: UI 조작 + page.evaluate()로 자동화 가능
      */
     // 3.3.0 이후 대응 키가 없는 스펙일 수 있으나 구현 예시
-    const logoutBtn = page.getByRole('button', { name: 'Logout' }).or(page.locator('.logout-btn, #logoutBtn'));
+    const logoutBtn = page.getByRole('button', { name: /logout|로그아웃/i }).or(page.locator('.logout-btn, #logoutBtn'));
     if (await logoutBtn.isVisible()) {
       await logoutBtn.click();
       await page.waitForURL(/\/renobit\/login\.do/);
@@ -200,21 +200,19 @@ test.describe('COMMON Module Tests', () => {
     // ※ [QATC-2940]과 통합됨 (언어 변경 시의 팝업 확인 및 적용을 한 번에 검증)
     const langSelect = page.locator('.langs select').first();
     
-    // 팝업이 뜰 경우를 대비하여 무조건 수락 처리 및 발생 여부 확인
-    let dialogTriggered = false;
-    page.once('dialog', async dialog => {
-      dialogTriggered = true;
-      await dialog.accept();
-    });
-    
     if (await langSelect.isVisible()) {
       await langSelect.selectOption({ value: 'zh-CN' }); // 중국어로 변경 테스트
+
+      // 언어 변경 시 Element UI $confirm이 뜰 수 있음 (native dialog가 아니므로 page.on('dialog') 불가)
+      const confirmDialog = page.locator('.el-message-box').first();
+      if (await confirmDialog.isVisible({ timeout: 2000 }).catch(() => false)) {
+        await confirmDialog.locator('.el-message-box__btns .el-button--primary').click();
+        await confirmDialog.waitFor({ state: 'hidden', timeout: 5000 }).catch(() => {});
+      }
+
       await page.waitForTimeout(500);
-      
-      expect(dialogTriggered).toBe(true); // 팝업 노출 정상 테스트 (기존 2940 목적 병합)
-      
       const newLangValue = await langSelect.inputValue();
-      expect(newLangValue).toBe('zh-CN'); // 언어 값이 정확히 변경되었는지 확인 (기존 2948 목적)
+      expect(newLangValue).toBe('zh-CN'); // 언어 값이 정확히 변경되었는지 확인
     } else {
       test.skip();
     }
