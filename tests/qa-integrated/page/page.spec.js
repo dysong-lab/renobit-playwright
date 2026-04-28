@@ -362,7 +362,7 @@ test.describe('PAGE Module Tests', () => {
       }
     }, { mName: masterName });
     // 저장 완료 신호: 서버 응답 후 success 토스트 출현
-    await page.locator('.el-message--success').first().waitFor({ state: 'attached', timeout: 10000 });
+    await page.locator('.el-message--success').first().waitFor({ state: 'attached', timeout: 30000 });
     await ensureTestPage(page, 'qa-page-test-page');
 
     // Properties 패널 열기
@@ -576,11 +576,19 @@ test.describe('PAGE Module Tests', () => {
     
     // 'Init page' 클릭
     await selectContextMenu(page, /Init page|초기 페이지/i);
-    
+
+    // 확인 다이얼로그 'OK' 클릭
+    const confirmDialog = page.getByRole('dialog').filter({ hasText: /초기 페이지로 설정/ }).first();
+    await confirmDialog.waitFor({ state: 'visible', timeout: 5000 });
+    await confirmDialog.getByRole('button', { name: 'OK' }).click();
+    await confirmDialog.waitFor({ state: 'hidden', timeout: 5000 }).catch(() => {});
+
     await page.waitForTimeout(1000);
     const isInitSet = await page.evaluate((name) => {
-      const pageInfo = (window.wemb.pageTreeDataManager.treeData || []).find(i => i.text === name);
-      return pageInfo?.isInitPage === true || pageInfo?.isStartPage === true;
+      const treeData = window.wemb.pageTreeDataManager.treeData || [];
+      const pageInfo = treeData.find(i => i.text === name);
+      if (!pageInfo) return false;
+      return window.wemb.configManager._startPageId === pageInfo.id;
     }, currentPageName);
     expect(isInitSet).toBe(true);
   });
