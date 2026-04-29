@@ -172,7 +172,7 @@ test.describe('PROPERTIES - Page Level Tests', () => {
       page.getByRole('tabpanel', { name: 'Properties' }).getByText('Id').first()
     ).toBeVisible({ timeout: 5000 });
     const idFound = await page.evaluate(
-      (id) => document.body.textContent.includes(id),
+      (id) => [...document.querySelectorAll('input')].some(el => el.value.includes(id)),
       pageId
     );
     expect(idFound).toBe(true);
