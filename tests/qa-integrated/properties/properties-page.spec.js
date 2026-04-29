@@ -168,7 +168,9 @@ test.describe('PROPERTIES - Page Level Tests', () => {
     expect(pageId).toBeTruthy();
 
     // Id 텍스트 레이블과 해당 값이 화면에 표시됨을 확인
-    await expect(page.getByText('Id').first()).toBeVisible({ timeout: 5000 });
+    await expect(
+      page.getByRole('tabpanel', { name: 'Properties' }).getByText('Id').first()
+    ).toBeVisible({ timeout: 5000 });
     const idFound = await page.evaluate(
       (id) => document.body.textContent.includes(id),
       pageId

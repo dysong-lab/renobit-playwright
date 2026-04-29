@@ -75,8 +75,6 @@ test.describe('PROPERTIES - Background / Assets Tests', () => {
     await ensureSectionExpanded(page, 'Stage');
     const resetBtn = page.locator('button').filter({ hasText: /reset|초기화/i }).first();
     await expect(resetBtn).toBeAttached({ timeout: 5000 });
-    await resetBtn.click();
-    await page.waitForTimeout(200);
   });
 
   // ────────────────────────────────────────────────────────────
